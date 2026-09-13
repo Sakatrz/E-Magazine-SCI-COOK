@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Trigger Position Picker</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+  }
+  #left-panel {
+    flex: 1;
+    overflow: auto;
+    background: #222;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+  }
+  #canvas-wrap {
+    position: relative;
+    line-height: 0;
+  }
+  #canvas-wrap img {
+    max-width: 90vw;
+    display: block;
+  }
+  #overlay {
+    position: absolute;
+    top: 0; left: 0;
+    cursor: crosshair;
+  }
+  #right-panel {
+    width: 380px;
+    flex-shrink: 0;
+    background: #f5f5f5;
+    padding: 16px;
+    overflow: auto;
+    border-left: 1px solid #ccc;
+  }
+  h2 { font-size: 1rem; margin-top: 0; }
+  #file-input { margin-bottom: 12px; width: 100%; }
+  .trig-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+  }
+  .trig-item label { display: block; margin-top: 4px; font-weight: 600; }
+  .trig-item select, .trig-item input, .trig-item textarea {
+    width: 100%;
+    font-size: 0.8rem;
+    padding: 3px 4px;
+    margin-top: 2px;
+  }
+  .trig-item .coords { color: #555; font-size: 0.75rem; margin-top: 4px; }
+  .trig-item button.remove {
+    margin-top: 6px;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.75rem;
+  }
+  #output {
+    width: 100%;
+    height: 220px;
+    font-family: monospace;
+    font-size: 0.72rem;
+    margin-top: 10px;
+  }
+  #copy-btn {
+    margin-top: 6px;
+    width: 100%;
+    padding: 8px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .hint {
+    font-size: 0.78rem;
+    color: #555;
+    background: #fff9db;
+    border: 1px solid #f1e0a0;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="left-panel">
+  <div id="canvas-wrap">
+    <img id="page-img" alt="preview">
+    <canvas id="overlay"></canvas>
+  </div>
+</div>
+
+<div id="right-panel">
+  <h2>1. Buka gambar halaman</h2>
+  <input type="file" id="file-input" accept="image/png,image/jpeg">
+
+  <div class="hint">
+    Klik lalu drag di atas gambar untuk menggambar kotak area trigger
+    (tombol navigasi / teks yang bisa diklik). Bisa gambar berkali-kali
+    untuk beberapa trigger dalam 1 halaman.
+  </div>
+
+  <h2>2. Daftar trigger</h2>
+  <div id="trig-list"></div>
+
+  <h2>3. Hasil (copy ke pages-data.js)</h2>
+  <textarea id="output" readonly></textarea>
+  <button id="copy-btn">Copy ke Clipboard</button>
+</div>
+
+<script>
+const fileInput = document.getElementById("file-input");
+const img = document.getElementById("page-img");
+const overlay = document.getElementById("overlay");
+const ctx = overlay.getContext("2d");
+const trigList = document.getElementById("trig-list");
+const output = document.getElementById("output");
+const copyBtn = document.getElementById("copy-btn");
+
+let triggers = []; // {type, left, top, width, height, title, body}
+let naturalW = 0, naturalH = 0;
+let drawing = false;
+let startX = 0, startY = 0, curX = 0, curY = 0;
+
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  img.src = url;
+  img.onload = () => {
+    naturalW = img.naturalWidth;
+    naturalH = img.naturalHeight;
+    resizeOverlay();
+    triggers = [];
+    renderList();
+  };
+});
+
+function resizeOverlay() {
+  const rect = img.getBoundingClientRect();
+  overlay.style.width = rect.width + "px";
+  overlay.style.height = rect.height + "px";
+  overlay.width = rect.width;
+  overlay.height = rect.height;
+  overlay.style.position = "absolute";
+  overlay.style.left = "0";
+  overlay.style.top = "0";
+  redraw();
+}
+window.addEventListener("resize", resizeOverlay);
+
+overlay.addEventListener("mousedown", (e) => {
+  drawing = true;
+  const r = overlay.getBoundingClientRect();
+  startX = e.clientX - r.left;
+  startY = e.clientY - r.top;
+  curX = startX; curY = startY;
+});
+overlay.addEventListener("mousemove", (e) => {
+  if (!drawing) return;
+  const r = overlay.getBoundingClientRect();
+  curX = e.clientX - r.left;
+  curY = e.clientY - r.top;
+  redraw();
+});
+window.addEventListener("mouseup", () => {
+  if (!drawing) return;
+  drawing = false;
+  const w = Math.abs(curX - startX);
+  const h = Math.abs(curY - startY);
+  if (w < 4 || h < 4) { redraw(); return; } // terlalu kecil, abaikan
+
+  const dispW = overlay.width, dispH = overlay.height;
+  const left = Math.min(startX, curX) / dispW * 100;
+  const top = Math.min(startY, curY) / dispH * 100;
+  const width = w / dispW * 100;
+  const height = h / dispH * 100;
+
+  triggers.push({
+    type: "nav-next",
+    left: +left.toFixed(1),
+    top: +top.toFixed(1),
+    width: +width.toFixed(1),
+    height: +height.toFixed(1),
+    title: "",
+    body: ""
+  });
+  renderList();
+  redraw();
+});
+
+function redraw() {
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+  ctx.strokeStyle = "red";
+  ctx.fillStyle = "rgba(255,0,0,0.25)";
+  ctx.lineWidth = 2;
+
+  triggers.forEach((t) => {
+    const x = t.left / 100 * overlay.width;
+    const y = t.top / 100 * overlay.height;
+    const w = t.width / 100 * overlay.width;
+    const h = t.height / 100 * overlay.height;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeRect(x, y, w, h);
+  });
+
+  if (drawing) {
+    const x = Math.min(startX, curX);
+    const y = Math.min(startY, curY);
+    const w = Math.abs(curX - startX);
+    const h = Math.abs(curY - startY);
+    ctx.strokeStyle = "#2563eb";
+    ctx.strokeRect(x, y, w, h);
+  }
+}
+
+function renderList() {
+  trigList.innerHTML = "";
+  triggers.forEach((t, i) => {
+    const div = document.createElement("div");
+    div.className = "trig-item";
+    div.innerHTML = `
+      <label>Tipe</label>
+      <select data-i="${i}" data-field="type">
+        <option value="nav-prev" ${t.type === "nav-prev" ? "selected" : ""}>nav-prev (panah kiri)</option>
+        <option value="nav-next" ${t.type === "nav-next" ? "selected" : ""}>nav-next (panah kanan)</option>
+        <option value="popup" ${t.type === "popup" ? "selected" : ""}>popup (teks diklik)</option>
+      </select>
+      ${t.type === "popup" ? `
+        <label>Judul popup</label>
+        <input type="text" data-i="${i}" data-field="title" value="${t.title || ""}">
+        <label>Isi popup</label>
+        <textarea data-i="${i}" data-field="body" rows="2">${t.body || ""}</textarea>
+      ` : ""}
+      <div class="coords">left:${t.left}% top:${t.top}% width:${t.width}% height:${t.height}%</div>
+      <button class="remove" data-i="${i}">Hapus</button>
+    `;
+    trigList.appendChild(div);
+  });
+
+  trigList.querySelectorAll("select, input, textarea").forEach((el) => {
+    el.addEventListener("input", (e) => {
+      const i = +e.target.dataset.i;
+      const field = e.target.dataset.field;
+      triggers[i][field] = e.target.value;
+      renderOutput();
+    });
+  });
+  trigList.querySelectorAll("button.remove").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const i = +e.target.dataset.i;
+      triggers.splice(i, 1);
+      renderList();
+      redraw();
+    });
+  });
+
+  renderOutput();
+}
+
+function renderOutput() {
+  const lines = triggers.map((t) => {
+    if (t.type === "popup") {
+      return `      {
+        type: "popup",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        popup: { title: "${(t.title || "").replace(/"/g, '\\"')}", body: "${(t.body || "").replace(/"/g, '\\"')}" }
+      }`;
+    }
+    return `      {
+        type: "${t.type}",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height}
+      }`;
+  });
+  output.value = `triggers: [\n${lines.join(",\n")}\n    ]`;
+}
+
+copyBtn.addEventListener("click", () => {
+  output.select();
+  document.execCommand("copy");
+  copyBtn.textContent = "Tersalin!";
+  setTimeout(() => (copyBtn.textContent = "Copy ke Clipboard"), 1200);
+});
+</script>
+</body>
+</html>

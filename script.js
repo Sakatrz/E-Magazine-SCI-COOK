@@ -85,7 +85,7 @@ function handleTriggerClick(trigger) {
 
 function openPopup(popup) {
   popupTitle.textContent = popup.title;
-  popupBody.textContent = popup.body;
+  popupBody.innerHTML = popup.body;
   popupOverlay.classList.remove("hidden");
 }
 

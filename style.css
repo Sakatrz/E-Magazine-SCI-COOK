@@ -82,11 +82,16 @@ body {
 #popup-box {
   position: relative;
   background: #fff;
-  max-width: 420px;
-  width: 100%;
+  max-width: 90vw;
+  max-height: 85vh;
   border-radius: 10px;
   padding: 28px 22px 22px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: auto;
+}
+
+#popup-title.hidden {
+  display: none;
 }
 
 #popup-title {
@@ -99,6 +104,15 @@ body {
   margin: 0;
   line-height: 1.5;
   color: #222;
+}
+
+.popup-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 85vw;
+  max-height: 75vh;
+  border-radius: 4px;
 }
 
 #popup-close {

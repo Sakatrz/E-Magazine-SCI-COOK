@@ -84,8 +84,25 @@ function handleTriggerClick(trigger) {
 }
 
 function openPopup(popup) {
-  popupTitle.textContent = popup.title;
-  popupBody.textContent = popup.body;
+  if (popup.image) {
+    // mode gambar: tampilkan card hasil export Figma apa adanya
+    popupBody.innerHTML = "";
+    popupTitle.textContent = "";
+    popupTitle.classList.add("hidden");
+
+    const img = document.createElement("img");
+    img.src = popup.image;
+    img.alt = popup.alt || "";
+    img.className = "popup-image";
+    popupBody.appendChild(img);
+  } else {
+    // mode teks: fallback kalau belum ada desain gambarnya
+    popupTitle.classList.remove("hidden");
+    popupTitle.textContent = popup.title || "";
+    popupBody.innerHTML = "";
+    popupBody.textContent = popup.body || "";
+  }
+
   popupOverlay.classList.remove("hidden");
 }
 

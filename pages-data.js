@@ -28,18 +28,18 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO: sesuaikan dengan ukuran asli hasil export
     triggers: [
       {
-        type: "nav-next",
+        type: "nav-prev",
         left: 7.6,
-        top: 92.9,
-        width: 7.9,
-        height: 2.3
+        top: 92.8,
+        width: 8,
+        height: 2.6
       },
       {
         type: "nav-next",
-        left: 85.6,
-        top: 92.7,
+        left: 85.7,
+        top: 92.5,
         width: 7.9,
-        height: 2.3
+        height: 2.5
       }
     ]
   },
@@ -70,18 +70,18 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
-        type: "nav-next",
-        left: 7.5,
-        top: 92.9,
-        width: 8,
+        type: "nav-prev",
+        left: 7.7,
+        top: 92.8,
+        width: 7.9,
         height: 2.4
       },
       {
         type: "nav-next",
-        left: 85.6,
-        top: 92.7,
-        width: 7.9,
-        height: 2.3
+        left: 85.7,
+        top: 92.5,
+        width: 8,
+        height: 2.5
       }
     ]
   },
@@ -226,5 +226,82 @@ const PAGES = [
         height: 2.6
       }
     ]
-  }
+  },
+  {
+    id: "h11",
+    image: "images/h11.png",
+    ratio: 1202 / 1698, // TODO
+    triggers: [
+      {
+        type: "popup",
+        left: 57.6,
+        top: 80.5,
+        width: 18.1,
+        height: 1.6,
+        popup: { image: "images/popups/H11- termometer klinis.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 77.1,
+        top: 80.4,
+        width: 11.2,
+        height: 1.8,
+        popup: { image: "images/popups/H11- termometer digital.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 13.2,
+        top: 82.7,
+        width: 6.4,
+        height: 2,
+        popup: { image: "images/popups/H11- termometer digital.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 22.1,
+        top: 82.9,
+        width: 23.5,
+        height: 1.5,
+        popup: { image: "images/popups/H11- termometer inframerah.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 47.8,
+        top: 82.7,
+        width: 21.3,
+        height: 2.1,
+        popup: { image: "images/popups/H11- termometer ruangan.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 71.2,
+        top: 82.8,
+        width: 16.3,
+        height: 1.7,
+        popup: { image: "images/popups/H11- termometer lab.png", alt: "" }
+      },
+      {
+        type: "popup",
+        left: 13.1,
+        top: 85.2,
+        width: 19.1,
+        height: 1.5,
+        popup: { image: "images/popups/H11- termometer bimental.png", alt: "" }
+      },
+      {
+        type: "nav-prev",
+        left: 7.7,
+        top: 92.8,
+        width: 7.9,
+        height: 2.4
+      },
+      {
+        type: "nav-next",
+        left: 85.4,
+        top: 92.5,
+        width: 8.3,
+        height: 2.4
+      }
+    ]
+  },
 ];

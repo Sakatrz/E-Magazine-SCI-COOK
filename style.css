@@ -1,38 +1,210 @@
+/* ============================================================
+   E-Magazine SCI-COOK — style.css
+   Tema: Elegan, bersih, akademik
+   Responsive: Mobile (<640px) | Tablet (640–1024px) | Desktop (>1024px)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* ── Body & Background ───────────────────────────────────── */
 body {
-  margin: 0;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Outfit', system-ui, Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+#site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  flex-shrink: 0;        /* jangan susut, tinggi selalu tetap */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e4ea;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+  /* Desktop default */
+  height: 56px;
+  padding: 0 24px;
+}
+
+/* Kiri: judul */
+#header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+#header-logo {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+#header-titles {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+#header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a2236;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Kanan: toolbar */
+#header-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f5f6f8;
+  border: 1px solid #e0e4ea;
+  border-radius: 8px;
+  padding: 4px 6px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #dde1e8;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.tool-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #333;
-  font-family: system-ui, -apple-system, Arial, sans-serif;
+  min-width: 32px;
+  height: 30px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #4a5568;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent; /* hapus highlight tap di mobile */
+}
+
+.tool-btn:hover {
+  background: #eaecf0;
+  color: #1a2236;
+}
+
+.tool-btn:active {
+  background: #dde1e8;
+}
+
+.tool-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Input & indikator halaman */
+#page-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+#page-input {
+  width: 38px;
+  background: #ffffff;
+  border: 1px solid #cdd2da;
+  border-radius: 5px;
+  color: #1a2236;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 3px 2px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+#page-input:focus {
+  border-color: #7b90b2;
+  box-shadow: 0 0 0 3px rgba(100, 130, 180, 0.12);
+}
+
+.page-sep {
+  color: #a0aab8;
+  font-weight: 400;
+}
+
+#total-pages {
+  color: #8a95a8;
+}
+
+/* ── Main area ───────────────────────────────────────────── */
+#magazine-main {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;           /* penting: agar flex child tidak melampaui parent */
+  scrollbar-gutter: stable;/* cegah layout shift saat scrollbar muncul/hilang */
 }
 
 #magazine-wrapper {
-  width: 100%;
-  height: 100vh;
+  /* Trik centering yang benar untuk scroll container:
+     min-width/min-height 100% → wrapper mengisi main saat konten kecil
+     (flex bisa center), tapi wrapper bisa tumbuh melebihi main saat zoom
+     besar sehingga bisa discroll ke semua arah termasuk ke atas. */
+  min-width: 100%;
+  min-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+
+  /* Desktop default — harus sinkron dengan JS fitContainer */
+  padding: 16px;
 }
 
-/* Container ini yang menjaga rasio halaman (mirip A4) supaya
-   trigger yang diposisikan pakai persen selalu pas di atas gambar,
-   baik di mobile, tablet, maupun desktop. */
+/* Container halaman — ukuran diisi oleh script.js (fitContainer) */
 #page-container {
-  /* Ukuran (width/height) TIDAK diatur lewat CSS aspect-ratio, karena
-     ternyata hasilnya tidak konsisten di semua kombinasi ukuran layar
-     (aspect-ratio + max-width + max-height + parent flex/grid saling
-     tabrakan di beberapa browser). Sebagai gantinya, width & height diisi
-     langsung dalam pixel oleh script.js (fungsi fitContainer), dihitung
-     ulang tiap kali resize supaya selalu presisi rasio A4-nya. */
   position: relative;
   background: #fff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  flex-shrink: 0; /* jangan susut oleh flex parent */
 }
 
 #page-image {
@@ -41,9 +213,9 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: fill; /* aman karena container rasio disamakan dgn rasio gambar asli */
+  object-fit: fill;
   user-select: none;
-  pointer-events: none; /* gambar sendiri tidak bisa diklik, sesuai kebutuhan */
+  pointer-events: none;
 }
 
 /* Trigger transparan di atas gambar */
@@ -56,23 +228,21 @@ body {
   margin: 0;
 }
 
-/* Aktifkan baris ini sementara saat development untuk melihat
-   posisi trigger. Hapus/comment lagi saat sudah pas. */
 .trigger.debug {
   background: rgba(255, 0, 0, 0.35);
   outline: 1px dashed red;
 }
 
-/* Pop up */
+/* ── Pop up ──────────────────────────────────────────────── */
 #popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  z-index: 50;
+  padding: 16px;
+  z-index: 200;
 }
 
 #popup-overlay.hidden {
@@ -84,10 +254,16 @@ body {
   background: #fff;
   max-width: 90vw;
   max-height: 85vh;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 28px 22px 22px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
   overflow: auto;
+  animation: popup-in 0.2s ease;
+}
+
+@keyframes popup-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 #popup-title.hidden {
@@ -96,14 +272,15 @@ body {
 
 #popup-title {
   margin: 0 0 10px;
-  font-size: 1.3rem;
-  color: #b03a00;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a2236;
 }
 
 #popup-body {
   margin: 0;
-  line-height: 1.5;
-  color: #222;
+  line-height: 1.6;
+  color: #444;
 }
 
 .popup-image {
@@ -121,8 +298,304 @@ body {
   right: 12px;
   border: none;
   background: none;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  color: #555;
+  color: #888;
+  transition: color 0.15s;
+}
+
+#popup-close:hover {
+  color: #1a2236;
+}
+
+/* ── Tidak dipakai, disembunyikan ───────────────────────── */
+#header-icon,
+#header-subtitle {
+  display: none;
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet  (≤ 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+  #site-header {
+    height: 52px;
+    padding: 0 16px;
+    gap: 6px;
+  }
+
+  #header-title {
+    font-size: 1rem;
+  }
+
+  .toolbar-group {
+    padding: 3px 5px;
+  }
+
+  .tool-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    font-size: 0.78rem;
+  }
+
+  #magazine-wrapper {
+    padding: 12px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile Standar  (≤ 640px)
+   ============================================================ */
+@media (max-width: 640px) {
+  #site-header {
+    height: 48px;
+    padding: 0 10px;
+    gap: 4px;
+  }
+
+  #header-title {
+    font-size: 0.88rem;
+    letter-spacing: 0;
+  }
+
+  /* Toolbar lebih rapat di mobile */
+  #header-toolbar {
+    gap: 3px;
+  }
+
+  .toolbar-group {
+    padding: 2px 4px;
+    border-radius: 6px;
+  }
+
+  .toolbar-divider {
+    margin: 0 2px;
+    height: 20px;
+  }
+
+  .tool-btn {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 5px;
+    font-size: 0.75rem;
+    border-radius: 5px;
+  }
+
+  /* Sembunyikan teks "100%" pada zoom reset, tampilkan hanya icon */
+  #btn-zoom-reset {
+    display: none;
+  }
+
+  /* Sembunyikan divider zoom di mobile untuk hemat ruang */
+  #zoom-group + .toolbar-divider {
+    display: none;
+  }
+
+  #page-input {
+    width: 30px;
+  }
+
+  /* Wrapper padding minimal di mobile agar halaman semaksimal mungkin */
+  #magazine-wrapper {
+    padding: 8px;
+  }
+
+  /* Popup lebih penuh di mobile */
+  #popup-box {
+    border-radius: 8px;
+    padding: 24px 16px 16px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile L  (≤ 425px)
+   ============================================================ */
+@media (max-width: 425px) {
+  #site-header {
+    height: 46px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  #header-title {
+    font-size: 0.82rem;
+  }
+
+  #header-toolbar {
+    gap: 2px;
+  }
+
+  .toolbar-group {
+    padding: 2px 3px;
+    border-radius: 6px;
+    gap: 2px;
+  }
+
+  .toolbar-divider {
+    margin: 0 1px;
+    height: 16px;
+  }
+
+  .tool-btn {
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+  .tool-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #page-indicator {
+    font-size: 0.75rem;
+    gap: 3px;
+    padding: 0 2px;
+  }
+
+  #page-input {
+    width: 25px;
+    height: 22px;
+    font-size: 0.78rem;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+  #total-pages,
+  .page-sep {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Di Bawah Mobile M  (≤ 374px)
+   ============================================================ */
+@media (max-width: 374px) {
+  #site-header {
+    height: 44px;
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  #header-title {
+    font-size: 0.76rem;
+    letter-spacing: -0.01em;
+  }
+
+  #header-toolbar {
+    gap: 2px;
+  }
+
+  /* Hilangkan divider vertikal agar lebih lapang dan bersih */
+  .toolbar-divider {
+    display: none;
+  }
+
+  .toolbar-group {
+    padding: 2px 3px;
+    border-radius: 5px;
+    gap: 2px;
+  }
+
+  .tool-btn {
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+  .tool-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  #page-indicator {
+    font-size: 0.74rem;
+    gap: 2px;
+    padding: 0 2px;
+  }
+
+  #page-input {
+    width: 24px;
+    height: 21px;
+    font-size: 0.75rem;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+  #total-pages,
+  .page-sep {
+    font-size: 0.74rem;
+  }
+
+  #magazine-wrapper {
+    padding: 6px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile Sangat Kecil / Mobile S  (≤ 330px)
+   ============================================================ */
+@media (max-width: 330px) {
+  #site-header {
+    height: 42px;
+    padding: 0 4px;
+    gap: 2px;
+  }
+
+  #header-title {
+    font-size: 0.68rem;
+    letter-spacing: -0.02em;
+  }
+
+  #header-toolbar {
+    gap: 1px;
+  }
+
+  .toolbar-group {
+    padding: 1px 2px;
+    border-radius: 4px;
+    gap: 1px;
+  }
+
+  .tool-btn {
+    min-width: 22px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 3px;
+  }
+
+  .tool-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #page-indicator {
+    font-size: 0.68rem;
+    gap: 1px;
+    padding: 0 1px;
+  }
+
+  #page-input {
+    width: 20px;
+    height: 20px;
+    font-size: 0.68rem;
+    padding: 0;
+    border-radius: 3px;
+  }
+
+  #total-pages,
+  .page-sep {
+    font-size: 0.68rem;
+  }
+
+  #magazine-wrapper {
+    padding: 4px;
+  }
 }

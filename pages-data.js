@@ -49,19 +49,179 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
+        type: "nav-page",
+        left: 11.3,
+        top: 19,
+        width: 79.4,
+        height: 2.7,
+        page: 2
+      },
+      {
+        type: "nav-page",
+        left: 11.3,
+        top: 22.2,
+        width: 79.4,
+        height: 1.7,
+        page: 3
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 24.3,
+        width: 79.2,
+        height: 2.3,
+        page: 5
+      },
+      {
+        type: "nav-page",
+        left: 11.1,
+        top: 26.9,
+        width: 79.6,
+        height: 2.3,
+        page: 6
+      },
+      {
+        type: "nav-page",
+        left: 11.1,
+        top: 29.6,
+        width: 79.8,
+        height: 2.1,
+        page: 7
+      },
+      {
+        type: "nav-page",
+        left: 10.9,
+        top: 32.1,
+        width: 80.6,
+        height: 2.4,
+        page: 8
+      },
+      {
+        type: "nav-page",
+        left: 11.8,
+        top: 36.5,
+        width: 79.4,
+        height: 2.6,
+        page: 10
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 39.5,
+        width: 80.1,
+        height: 2.5,
+        page: 11
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 42.3,
+        width: 79.8,
+        height: 1.8,
+        page: 12
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 44.4,
+        width: 79.9,
+        height: 2.1,
+        page: 15
+      },
+      {
+        type: "nav-page",
+        left: 11.5,
+        top: 47,
+        width: 80.9,
+        height: 2,
+        page: 16
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 49.3,
+        width: 80.7,
+        height: 2.1,
+        page: 17
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 51.7,
+        width: 80.5,
+        height: 2.4,
+        page: 18
+      },
+      {
+        type: "nav-page",
+        left: 11.4,
+        top: 56.8,
+        width: 80.5,
+        height: 2.3,
+        page: 20
+      },
+      {
+        type: "nav-page",
+        left: 11.4,
+        top: 59.3,
+        width: 80.5,
+        height: 2.1,
+        page: 22
+      },
+      {
+        type: "nav-page",
+        left: 11.7,
+        top: 61.7,
+        width: 80,
+        height: 2.3,
+        page: 25
+      },
+      {
+        type: "nav-page",
+        left: 11.3,
+        top: 64.3,
+        width: 80.5,
+        height: 2.6,
+        page: 26
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 67.2,
+        width: 80.7,
+        height: 1.8,
+        page: 28
+      },
+      {
+        type: "nav-page",
+        left: 11.1,
+        top: 69.3,
+        width: 80.9,
+        height: 2.2,
+        page: 29
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 71.8,
+        width: 80.4,
+        height: 2.6,
+        page: 30
+      },
+      {
         type: "nav-prev",
         left: 7.6,
-        top: 92.9,
+        top: 92.8,
         width: 8,
-        height: 2.3,
+        height: 2.4
       },
       {
         type: "nav-next",
         left: 85.6,
         top: 92.6,
-        width: 8,
-        height: 2.4,
-      },
+        width: 8.1,
+        height: 2.4
+      }
     ],
   },
   {
@@ -70,19 +230,99 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
+        type: "nav-page",
+        left: 11.2,
+        top: 18.9,
+        width: 77,
+        height: 1.9,
+        page: 32
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 21.1,
+        width: 77.9,
+        height: 1.8,
+        page: 33
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 23.2,
+        width: 78.9,
+        height: 2,
+        page: 36
+      },
+      {
+        type: "nav-page",
+        left: 11.2,
+        top: 25.5,
+        width: 79.1,
+        height: 1.9,
+        page: 37
+      },
+      {
+        type: "nav-page",
+        left: 11.1,
+        top: 27.6,
+        width: 79.6,
+        height: 2.4,
+        page: 38
+      },
+      {
+        type: "nav-page",
+        left: 11,
+        top: 32.2,
+        width: 77.2,
+        height: 2.1,
+        page: 39
+      },
+      {
+        type: "nav-page",
+        left: 10.9,
+        top: 34.7,
+        width: 77.9,
+        height: 1.8,
+        page: 43
+      },
+      {
+        type: "nav-page",
+        left: 10.9,
+        top: 36.8,
+        width: 78.2,
+        height: 1.8,
+        page: 44
+      },
+      {
+        type: "nav-page",
+        left: 10.8,
+        top: 39.1,
+        width: 77.8,
+        height: 2,
+        page: 45
+      },
+      {
+        type: "nav-page",
+        left: 10.7,
+        top: 41.4,
+        width: 78.9,
+        height: 2.2,
+        page: 47
+      },
+      {
         type: "nav-prev",
         left: 7.7,
         top: 92.8,
-        width: 7.9,
-        height: 2.4,
+        width: 8,
+        height: 2.6
       },
       {
         type: "nav-next",
         left: 85.7,
         top: 92.5,
         width: 8,
-        height: 2.5,
-      },
+        height: 2.6
+      }
     ],
   },
   {

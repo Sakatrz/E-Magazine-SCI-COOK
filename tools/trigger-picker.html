@@ -256,10 +256,23 @@ function renderList() {
     div.innerHTML = `
       <label>Tipe</label>
       <select data-i="${i}" data-field="type">
-        <option value="nav-prev" ${t.type === "nav-prev" ? "selected" : ""}>nav-prev (panah kiri)</option>
         <option value="nav-next" ${t.type === "nav-next" ? "selected" : ""}>nav-next (panah kanan)</option>
+        <option value="nav-prev" ${t.type === "nav-prev" ? "selected" : ""}>nav-prev (panah kiri)</option>
+        <option value="nav-page" ${t.type === "nav-page" ? "selected" : ""}>nav-page (daftar isi / lompat halaman)</option>
+        <option value="link" ${t.type === "link" ? "selected" : ""}>link (buka URL web eksternal)</option>
         <option value="popup" ${t.type === "popup" ? "selected" : ""}>popup (teks diklik)</option>
       </select>
+
+      ${t.type === "nav-page" ? `
+        <label>Nomor Halaman Tujuan (1 s.d. 48)</label>
+        <input type="number" min="1" max="100" data-i="${i}" data-field="page" value="${t.page || 1}" placeholder="Contoh: 5">
+      ` : ""}
+
+      ${t.type === "link" ? `
+        <label>URL Tujuan (link web)</label>
+        <input type="url" data-i="${i}" data-field="url" value="${t.url || ''}" placeholder="https://www.educaplay.com/...">
+      ` : ""}
+
       ${t.type === "popup" ? `
         ${otherPopupIndexes.length > 0 ? `
           <label>Teks ini lanjutan/kembar dari trigger popup lain? (buat teks yang kepotong ganti baris)</label>
@@ -311,6 +324,9 @@ function renderList() {
 
       triggers[i][field] = e.target.value;
       if (field === "type") {
+        // Set default nilai jika field berganti
+        if (e.target.value === "nav-page" && !triggers[i].page) triggers[i].page = 1;
+        if (e.target.value === "link" && !triggers[i].url) triggers[i].url = "https://";
         renderList();
         return;
       }
@@ -339,6 +355,26 @@ function renderOutput() {
         width: ${t.width},
         height: ${t.height},
         popup: { image: "${(t.image || "").replace(/"/g, '\\"')}" }
+      }`;
+    }
+    if (t.type === "nav-page") {
+      return `      {
+        type: "nav-page",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        page: ${parseInt(t.page, 10) || 1}
+      }`;
+    }
+    if (t.type === "link") {
+      return `      {
+        type: "link",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        url: "${(t.url || "").replace(/"/g, '\\"')}"
       }`;
     }
     return `      {

@@ -214,6 +214,24 @@ function handleTriggerClick(trigger) {
     if (currentPageIndex > 0) {
       renderPage(currentPageIndex - 1);
     }
+  } else if (trigger.type === "nav-page" || trigger.type === "goto" || trigger.type === "daftar-isi") {
+    // Navigasi ke halaman tertentu (nomor halaman 1 s.d. total halaman atau page ID)
+    let targetIndex = -1;
+    if (typeof trigger.page === "number") {
+      targetIndex = trigger.page - 1; // Konversi nomor halaman 1-based ke index array 0-based
+    } else if (typeof trigger.target === "number") {
+      targetIndex = trigger.target - 1;
+    } else if (typeof trigger.page === "string") {
+      const num = parseInt(trigger.page, 10);
+      if (!isNaN(num)) {
+        targetIndex = num - 1;
+      } else {
+        targetIndex = PAGES.findIndex((p) => p.id === trigger.page);
+      }
+    }
+    if (targetIndex >= 0 && targetIndex < PAGES.length) {
+      renderPage(targetIndex);
+    }
   } else if (trigger.type === "link") {
     window.open(trigger.url, "_blank", "noopener,noreferrer");
   } else if (trigger.type === "popup") {

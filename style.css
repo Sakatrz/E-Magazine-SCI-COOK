@@ -21,7 +21,6 @@ body {
   flex-direction: column;
   font-family: 'Outfit', system-ui, Arial, sans-serif;
   background-color: #f0f2f5;
-  touch-action: pan-x pan-y;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -89,7 +88,9 @@ body {
   background: #f5f6f8;
   border: 1px solid #e0e4ea;
   border-radius: 8px;
-  padding: 4px 6px;
+  padding: 3px 6px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .toolbar-divider {
@@ -143,10 +144,14 @@ body {
   font-size: 0.83rem;
   font-weight: 600;
   color: #4a5568;
+  height: 30px;
+  box-sizing: border-box;
 }
 
 #page-input {
   width: 38px;
+  height: 28px;
+  box-sizing: border-box;
   background: #ffffff;
   border: 1px solid #cdd2da;
   border-radius: 5px;
@@ -155,7 +160,7 @@ body {
   font-size: 0.83rem;
   font-weight: 700;
   text-align: center;
-  padding: 3px 2px;
+  padding: 0 2px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -373,6 +378,7 @@ body {
   }
 
   .toolbar-group {
+    height: 36px;
     padding: 3px 5px;
   }
 
@@ -381,6 +387,14 @@ body {
     height: 28px;
     padding: 0 6px;
     font-size: 0.78rem;
+  }
+
+  #page-indicator {
+    height: 28px;
+  }
+
+  #page-input {
+    height: 26px;
   }
 
   #magazine-wrapper {
@@ -409,6 +423,7 @@ body {
   }
 
   .toolbar-group {
+    height: 32px;
     padding: 2px 4px;
     border-radius: 6px;
   }
@@ -436,8 +451,13 @@ body {
     display: none;
   }
 
+  #page-indicator {
+    height: 26px;
+  }
+
   #page-input {
     width: 30px;
+    height: 24px;
   }
 
   /* Wrapper padding minimal di mobile agar halaman semaksimal mungkin */
@@ -471,6 +491,7 @@ body {
   }
 
   .toolbar-group {
+    height: 30px;
     padding: 2px 3px;
     border-radius: 6px;
     gap: 2px;
@@ -495,6 +516,7 @@ body {
   }
 
   #page-indicator {
+    height: 24px;
     font-size: 0.75rem;
     gap: 3px;
     padding: 0 2px;
@@ -539,6 +561,7 @@ body {
   }
 
   .toolbar-group {
+    height: 28px;
     padding: 2px 3px;
     border-radius: 5px;
     gap: 2px;
@@ -558,6 +581,7 @@ body {
   }
 
   #page-indicator {
+    height: 24px;
     font-size: 0.74rem;
     gap: 2px;
     padding: 0 2px;
@@ -601,6 +625,7 @@ body {
   }
 
   .toolbar-group {
+    height: 26px;
     padding: 1px 2px;
     border-radius: 4px;
     gap: 1px;
@@ -620,6 +645,7 @@ body {
   }
 
   #page-indicator {
+    height: 22px;
     font-size: 0.68rem;
     gap: 1px;
     padding: 0 1px;

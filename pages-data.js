@@ -87,7 +87,7 @@ const PAGES = [
   },
   {
     id: "h3",
-    image: "images/h3.png",
+    image: "images/H3.png",
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
@@ -108,7 +108,7 @@ const PAGES = [
   },
   {
     id: "h4",
-    image: "images/h4.png",
+    image: "images/H4.png",
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
@@ -129,7 +129,7 @@ const PAGES = [
   },
   {
     id: "h5",
-    image: "images/h5.png",
+    image: "images/H5.png",
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
@@ -150,7 +150,7 @@ const PAGES = [
   },
   {
     id: "h6",
-    image: "images/h6.png",
+    image: "images/H6.png",
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
@@ -171,7 +171,7 @@ const PAGES = [
   },
   {
     id: "h7",
-    image: "images/h7.png",
+    image: "images/H7.png",
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
@@ -201,7 +201,7 @@ const PAGES = [
         top: 26.6,
         width: 8.8,
         height: 2.6,
-        popup: { image: "images/popups/H8-GEDEG.png" },
+        popup: { image: "images/popups/h8-gedeg.png" },
       },
       {
         type: "popup",
@@ -604,7 +604,7 @@ const PAGES = [
   },
   {
     id: "h20",
-    image: "images/h20.png",
+    image: "images/H20.png",
     ratio: 1198 / 1684,
     triggers: [
       {
@@ -649,7 +649,7 @@ const PAGES = [
   },
   {
     id: "h21",
-    image: "images/h21.png",
+    image: "images/H21.png",
     ratio: 1198 / 1684,
     triggers: [
       {
@@ -686,7 +686,7 @@ const PAGES = [
   },
   {
     id: "h22",
-    image: "images/h22.png",
+    image: "images/H22.png",
     ratio: 1198 / 1684,
     triggers: [
       {
@@ -731,7 +731,7 @@ const PAGES = [
   },
   {
     id: "h23",
-    image: "images/h23.png",
+    image: "images/H23.png",
     ratio: 1198 / 1684,
     triggers: [
       {

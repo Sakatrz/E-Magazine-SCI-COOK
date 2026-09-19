@@ -488,27 +488,27 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 29.7,
-        top: 82.4,
-        width: 40.6,
-        height: 5.9,
+        left: 28,
+        top: 67.2,
+        width: 44.9,
+        height: 7.1,
         url: "https://www.educaplay.com/learning-resources/30362352-padanan_suhu_termometer_dan_konversi_skala.html",
       },
       {
         type: "nav-next",
-        left: 80.1,
-        top: 91.3,
-        width: 17.5,
-        height: 6.2,
+        left: 79.1,
+        top: 90.7,
+        width: 20.8,
+        height: 6.4
       },
       {
         type: "nav-prev",
-        left: 2.1,
-        top: 91.2,
-        width: 19.3,
-        height: 6.1,
-      },
-    ],
+        left: 3.4,
+        top: 90.6,
+        width: 18.2,
+        height: 7.4
+      }
+    ]
   },
   {
     id: "h16",
@@ -913,24 +913,24 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 29.7,
-        top: 82.4,
-        width: 40.6,
-        height: 5.9,
+        left: 28.1,
+        top: 67,
+        width: 42.6,
+        height: 7.3,
         url: "https://www.educaplay.com/learning-resources/30362489-rangkaian_perpindahan_kalor.html",
       },
       {
         type: "nav-next",
-        left: 80.1,
+        left: 79.8,
         top: 91.3,
-        width: 17.2,
-        height: 5.8
+        width: 20.1,
+        height: 5.3
       },
       {
         type: "nav-prev",
-        left: 2.4,
-        top: 91.5,
-        width: 16.9,
+        left: 0.9,
+        top: 91.3,
+        width: 19.9,
         height: 5.4
       }
     ]
@@ -963,25 +963,25 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 29.7,
-        top: 82.4,
-        width: 40.6,
-        height: 5.9,
+        left: 28,
+        top: 70.7,
+        width: 44.8,
+        height: 8.2,
         url: "https://www.educaplay.com/learning-resources/30301382-pemuaian.html",
       },
       {
         type: "nav-next",
-        left: 84.1,
-        top: 89.8,
-        width: 13.3,
-        height: 6.9
+        left: 82,
+        top: 89.5,
+        width: 18,
+        height: 6.3
       },
       {
         type: "nav-prev",
-        left: 2.5,
-        top: 89.8,
-        width: 18.6,
-        height: 6.5
+        left: 1.1,
+        top: 89.6,
+        width: 19.5,
+        height: 6.1
       }
     ]
   },
@@ -1148,24 +1148,24 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 29.7,
-        top: 82.4,
-        width: 40.6,
-        height: 5.9,
-        url: "https://www.educaplay.com/learning-resources/30301382-pemuaian.html",
+        left: 27.8,
+        top: 79.8,
+        width: 45,
+        height: 7.5,
+        url: "https://www.educaplay.com/learning-resources/30301230-kuis_termal_a_z.html",
       },
       {
         type: "nav-next",
-        left: 81.4,
-        top: 89.8,
-        width: 16,
-        height: 6.2
+        left: 82.2,
+        top: 89.5,
+        width: 17.6,
+        height: 6.7
       },
       {
         type: "nav-prev",
-        left: 2.5,
-        top: 89.7,
-        width: 16.5,
+        left: 1.1,
+        top: 89.8,
+        width: 21.6,
         height: 6.3
       }
     ]
@@ -1177,17 +1177,17 @@ const PAGES = [
     triggers: [
       {
         type: "nav-next",
-        left: 79.3,
-        top: 87.1,
-        width: 18.8,
-        height: 7.7
+        left: 74.2,
+        top: 86,
+        width: 24.5,
+        height: 8.1
       },
       {
         type: "nav-prev",
-        left: 12.5,
-        top: 87,
-        width: 19,
-        height: 7.2
+        left: 1.3,
+        top: 86.7,
+        width: 22.7,
+        height: 7.8
       }
     ]
   },

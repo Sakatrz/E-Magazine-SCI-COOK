@@ -15,11 +15,13 @@
 /* ── Body & Background ───────────────────────────────────── */
 body {
   height: 100vh;
+  height: 100dvh; /* dynamic viewport height untuk browser mobile */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   font-family: 'Outfit', system-ui, Arial, sans-serif;
   background-color: #f0f2f5;
+  touch-action: pan-x pan-y;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -177,14 +179,14 @@ body {
   flex: 1;
   overflow: auto;
   min-height: 0;           /* penting: agar flex child tidak melampaui parent */
+  display: flex;
+  flex-direction: column;
   scrollbar-gutter: stable;/* cegah layout shift saat scrollbar muncul/hilang */
+  -webkit-overflow-scrolling: touch;
 }
 
 #magazine-wrapper {
-  /* Trik centering yang benar untuk scroll container:
-     min-width/min-height 100% → wrapper mengisi main saat konten kecil
-     (flex bisa center), tapi wrapper bisa tumbuh melebihi main saat zoom
-     besar sehingga bisa discroll ke semua arah termasuk ke atas. */
+  margin: auto;            /* sentralisasi vertikal & horizontal sempurna */
   min-width: 100%;
   min-height: 100%;
   display: flex;

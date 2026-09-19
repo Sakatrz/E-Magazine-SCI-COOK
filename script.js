@@ -11,6 +11,7 @@ const ZOOM_MAX = 3.0;
 
 const pageContainer = document.getElementById("page-container");
 const pageImage = document.getElementById("page-image");
+const pageLoader = document.getElementById("page-loader");
 const popupOverlay = document.getElementById("popup-overlay");
 const popupTitle = document.getElementById("popup-title");
 const popupBody = document.getElementById("popup-body");
@@ -89,17 +90,101 @@ function handleFullscreen() {
   }
 }
 
+// ── Smart Image Preloading ──────────────────────────────────
+// Mendownload gambar halaman & popup di latar belakang (background)
+// agar ketika user klik "Lanjut" gambar langsung muncul 0-detik dari cache browser.
+const preloadedImages = new Set();
+
+function preloadImage(url) {
+  if (!url || preloadedImages.has(url)) return;
+  preloadedImages.add(url);
+  const img = new Image();
+  img.src = url;
+}
+
+function preloadPageAssets(index) {
+  const page = PAGES[index];
+  if (!page) return;
+  preloadImage(page.image);
+  if (page.triggers) {
+    page.triggers.forEach((t) => {
+      if (t.type === "popup" && t.popup && t.popup.image) {
+        preloadImage(t.popup.image);
+      }
+    });
+  }
+}
+
+function preloadAdjacentPages(currentIndex) {
+  // 1. Pastikan aset halaman aktif (termasuk popup) sudah di-cache
+  preloadPageAssets(currentIndex);
+
+  // 2. Preload 3 halaman ke depan secara agresif (prioritas baca)
+  for (let i = 1; i <= 3; i++) {
+    const nextIdx = currentIndex + i;
+    if (nextIdx < PAGES.length) {
+      preloadPageAssets(nextIdx);
+    }
+  }
+
+  // 3. Preload 1 halaman ke belakang
+  if (currentIndex > 0) {
+    preloadPageAssets(currentIndex - 1);
+  }
+}
+
+// Preload bertahap untuk sisa seluruh halaman saat browser sedang santai/idle
+let idlePreloadIdx = 0;
+function startIdlePreload() {
+  function loadNext() {
+    if (idlePreloadIdx >= PAGES.length) return;
+    preloadPageAssets(idlePreloadIdx);
+    idlePreloadIdx++;
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(loadNext, { timeout: 2000 });
+    } else {
+      setTimeout(loadNext, 300);
+    }
+  }
+  setTimeout(loadNext, 1200); // Mulai setelah halaman pertama selesai tampil
+}
+
 function renderPage(index) {
   const page = PAGES[index];
   if (!page) return;
 
   currentPageIndex = index;
 
-  // set gambar background halaman
-  pageImage.src = page.image;
-
   fitContainer();
   updateHeaderUI();
+
+  // Preload halaman-halaman sekitar di latar belakang
+  preloadAdjacentPages(index);
+
+  // Periksa apakah gambar sudah ada di cache browser
+  const testImg = new Image();
+  testImg.src = page.image;
+
+  if (testImg.complete && testImg.naturalWidth !== 0) {
+    // Gambar sudah siap di memori -> langsung tampilkan tanpa loading spinner
+    pageImage.src = page.image;
+    if (pageLoader) pageLoader.classList.add("hidden");
+  } else {
+    // Gambar belum ada di memori -> tampilkan loading spinner lembut
+    if (pageLoader) pageLoader.classList.remove("hidden");
+    testImg.onload = () => {
+      // Pastikan pembaca masih berada di halaman yang sama saat download selesai
+      if (currentPageIndex === index) {
+        pageImage.src = page.image;
+        if (pageLoader) pageLoader.classList.add("hidden");
+      }
+    };
+    testImg.onerror = () => {
+      if (pageLoader) pageLoader.classList.add("hidden");
+    };
+    // Tetap pasang src ke pageImage
+    pageImage.src = page.image;
+  }
 
   // hapus trigger halaman sebelumnya
   document.querySelectorAll(".trigger").forEach((el) => el.remove());
@@ -233,3 +318,4 @@ if (elPageInput) {
 }
 
 renderPage(0);
+startIdlePreload();

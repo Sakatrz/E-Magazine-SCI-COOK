@@ -4,6 +4,9 @@
 // Set kembali ke false kalau sudah pas.
 const DEBUG_TRIGGERS = false;
 
+const FLIP_DURATION = 800; // ms — samakan dengan transition di style.css (.flipper)
+let isFlipping = false;
+
 let currentPageIndex = 0;
 let currentZoom = 1.0; // 1.0 = 100%
 const ZOOM_MIN = 0.5;
@@ -149,6 +152,77 @@ function startIdlePreload() {
   setTimeout(loadNext, 1200); // Mulai setelah halaman pertama selesai tampil
 }
 
+// ── Efek Balik Halaman (Page Flip) ────────────────────────────
+function createFlipper(imageSrc) {
+  const flipper = document.createElement("div");
+  flipper.className = "flipper";
+
+  const front = document.createElement("div");
+  front.className = "flip-face flip-front";
+  const img = document.createElement("img");
+  img.src = imageSrc;
+  img.alt = "";
+  front.appendChild(img);
+
+  const back = document.createElement("div");
+  back.className = "flip-face flip-back";
+
+  flipper.appendChild(front);
+  flipper.appendChild(back);
+  return flipper;
+}
+
+async function goToPage(target) {
+  if (isFlipping) return;
+  if (target < 0 || target >= PAGES.length || target === currentPageIndex) return;
+
+  const goingNext = target > currentPageIndex;
+  const oldPage = PAGES[currentPageIndex];
+  const newPage = PAGES[target];
+
+  // Jika user prefer-reduced-motion, langsung render tanpa animasi
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    renderPage(target);
+    return;
+  }
+
+  isFlipping = true;
+
+  // Preload gambar halaman tujuan sebelum animasi (agar tidak blank)
+  await new Promise((resolve) => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve();
+    img.src = newPage.image;
+  });
+
+  pageContainer.classList.add("flipping");
+
+  // Maju: halaman lama berputar ke kiri, menyingkap halaman baru di bawahnya.
+  // Mundur: halaman baru berputar dari kiri ke kanan, menutup halaman lama.
+  const flipper = createFlipper(goingNext ? oldPage.image : newPage.image);
+  flipper.style.transform = goingNext ? "rotateY(0deg)" : "rotateY(-180deg)";
+  flipper.style.opacity = goingNext ? "1" : "0";
+
+  if (goingNext) renderPage(target); // halaman baru sudah siap di bawah flipper
+  pageContainer.appendChild(flipper);
+
+  void flipper.offsetWidth; // paksa reflow supaya transisi mulai dari kondisi awal
+
+  flipper.style.transitionProperty = "transform, opacity";
+  flipper.style.transitionDuration = FLIP_DURATION + "ms, 250ms";
+  flipper.style.transitionDelay = goingNext ? "0ms, 550ms" : "0ms, 0ms";
+  flipper.style.transform = goingNext ? "rotateY(-180deg)" : "rotateY(0deg)";
+  flipper.style.opacity = goingNext ? "0" : "1";
+
+  setTimeout(() => {
+    if (!goingNext) renderPage(target); // render halaman tujuan setelah animasi selesai
+    flipper.remove();
+    pageContainer.classList.remove("flipping");
+    isFlipping = false;
+  }, FLIP_DURATION + 60);
+}
+
 function renderPage(index) {
   const page = PAGES[index];
   if (!page) return;
@@ -207,13 +281,10 @@ function renderPage(index) {
 
 function handleTriggerClick(trigger) {
   if (trigger.type === "nav-next") {
-    if (currentPageIndex < PAGES.length - 1) {
-      renderPage(currentPageIndex + 1);
-    }
+    // Gunakan goToPage() agar ada animasi balik halaman
+    goToPage(currentPageIndex + 1);
   } else if (trigger.type === "nav-prev") {
-    if (currentPageIndex > 0) {
-      renderPage(currentPageIndex - 1);
-    }
+    goToPage(currentPageIndex - 1);
   } else if (trigger.type === "nav-page" || trigger.type === "goto" || trigger.type === "daftar-isi") {
     // Navigasi ke halaman tertentu (nomor halaman 1 s.d. total halaman atau page ID)
     let targetIndex = -1;
@@ -271,12 +342,12 @@ popupOverlay.addEventListener("click", (e) => {
   if (e.target === popupOverlay) closePopup();
 });
 
-// Navigasi keyboard (tombol panah & Escape)
+// Navigasi keyboard (tombol panah & Escape) — pakai goToPage() untuk efek flip
 document.addEventListener("keydown", (e) => {
   // Jangan jalankan navigasi halaman kalau user sedang mengetik di input
   if (document.activeElement === elPageInput) return;
-  if (e.key === "ArrowRight") handleTriggerClick({ type: "nav-next" });
-  if (e.key === "ArrowLeft") handleTriggerClick({ type: "nav-prev" });
+  if (e.key === "ArrowRight") goToPage(currentPageIndex + 1);
+  if (e.key === "ArrowLeft")  goToPage(currentPageIndex - 1);
   if (e.key === "Escape") closePopup();
 });
 

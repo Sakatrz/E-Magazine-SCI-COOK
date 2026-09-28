@@ -668,3 +668,53 @@ body {
     padding: 4px;
   }
 }
+
+/* ============================================================
+   Efek Balik Halaman (Page Flip) — 3D CSS
+   ============================================================ */
+
+/* perspective hanya aktif saat animasi berlangsung */
+#page-container.flipping {
+  perspective: 2200px;
+}
+
+/* selama animasi, trigger tidak bisa diklik (mencegah klik ganda) */
+#page-container.flipping .trigger {
+  pointer-events: none;
+}
+
+/* selama animasi, sembunyikan loader agar tidak mengganggu animasi */
+#page-container.flipping #page-loader {
+  display: none;
+}
+
+.flipper {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  transform-origin: left center; /* engsel di tepi kiri, seperti punggung buku */
+  transform-style: preserve-3d;
+  transition-timing-function: cubic-bezier(0.45, 0.05, 0.25, 1);
+  box-shadow: none; /* hapus bayangan hitam di sebelah kiri saat membalik */
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-front img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+}
+
+/* sisi belakang kertas saat halaman sudah terbalik */
+.flip-back {
+  transform: rotateY(180deg);
+  background: #fafafa;
+}

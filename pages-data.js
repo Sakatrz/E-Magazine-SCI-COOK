@@ -728,25 +728,25 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 28,
-        top: 67.2,
-        width: 44.9,
-        height: 7.1,
-        url: "https://www.educaplay.com/learning-resources/30362352-padanan_suhu_termometer_dan_konversi_skala.html",
+        left: 30.6,
+        top: 67.6,
+        width: 39.3,
+        height: 6.2,
+        url: "https://www.educaplay.com/learning-resources/31029283-temperatura_conceptos_basicos.html",
       },
       {
         type: "nav-next",
-        left: 79.1,
-        top: 90.7,
-        width: 20.8,
-        height: 6.4
+        left: 82.2,
+        top: 90.9,
+        width: 17.5,
+        height: 7.2
       },
       {
         type: "nav-prev",
-        left: 3.4,
-        top: 90.6,
-        width: 18.2,
-        height: 7.4
+        left: 0.7,
+        top: 90.7,
+        width: 19,
+        height: 7.2
       }
     ]
   },

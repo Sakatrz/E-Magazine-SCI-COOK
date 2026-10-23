@@ -2,15 +2,19 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<!-- Judul tab browser untuk alat bantu ini -->
 <title>Trigger Position Picker</title>
 <style>
+  /* Reset: semua elemen menghitung ukuran termasuk padding & border */
   * { box-sizing: border-box; }
+  /* Tata letak dua kolom: panel kiri (gambar) dan panel kanan (kontrol) */
   body {
     margin: 0;
     font-family: system-ui, Arial, sans-serif;
     display: flex;
     height: 100vh;
   }
+  /* Panel kiri: area gelap tempat gambar halaman ditampilkan, bisa di-scroll jika gambar besar */
   #left-panel {
     flex: 1;
     overflow: auto;
@@ -20,19 +24,23 @@
     justify-content: center;
     padding: 20px;
   }
+  /* Pembungkus gambar dan canvas (papan gambar) yang bertumpuk */
   #canvas-wrap {
     position: relative;
     line-height: 0;
   }
+  /* Gambar halaman majalah yang ditampilkan sebagai acuan menggambar area trigger */
   #canvas-wrap img {
     max-width: 90vw;
     display: block;
   }
+  /* Canvas transparan di atas gambar: tempat kotak merah trigger digambar */
   #overlay {
     position: absolute;
     top: 0; left: 0;
-    cursor: crosshair;
+    cursor: crosshair; /* kursor berubah menjadi salib saat berada di atas canvas */
   }
+  /* Panel kanan: formulir pengaturan trigger dan area hasil kode */
   #right-panel {
     width: 380px;
     flex-shrink: 0;
@@ -43,6 +51,7 @@
   }
   h2 { font-size: 1rem; margin-top: 0; }
   #file-input { margin-bottom: 12px; width: 100%; }
+  /* Kartu satu trigger di daftar: berisi tipe, koordinat, dan tombol hapus */
   .trig-item {
     background: #fff;
     border: 1px solid #ddd;
@@ -58,7 +67,9 @@
     padding: 3px 4px;
     margin-top: 2px;
   }
+  /* Teks koordinat kecil di bawah setiap kartu trigger */
   .trig-item .coords { color: #555; font-size: 0.75rem; margin-top: 4px; }
+  /* Tombol hapus trigger: warna merah */
   .trig-item button.remove {
     margin-top: 6px;
     background: #c0392b;
@@ -69,6 +80,7 @@
     cursor: pointer;
     font-size: 0.75rem;
   }
+  /* Area teks baca-saja yang menampilkan hasil kode trigger siap tempel */
   #output {
     width: 100%;
     height: 220px;
@@ -76,6 +88,7 @@
     font-size: 0.72rem;
     margin-top: 10px;
   }
+  /* Tombol salin hasil ke clipboard */
   #copy-btn {
     margin-top: 6px;
     width: 100%;
@@ -86,6 +99,7 @@
     border-radius: 6px;
     cursor: pointer;
   }
+  /* Kotak petunjuk kuning atau biru */
   .hint {
     font-size: 0.78rem;
     color: #555;
@@ -99,17 +113,24 @@
 </head>
 <body>
 
+<!-- ===== Panel Kiri: Area Gambar ===== -->
+<!-- Tempat menampilkan gambar halaman majalah dan menggambar kotak area trigger di atasnya -->
 <div id="left-panel">
   <div id="canvas-wrap">
+    <!-- Gambar halaman yang dimuat dari file lokal; sumber diisi oleh JavaScript -->
     <img id="page-img" alt="preview">
+    <!-- Canvas transparan di atas gambar: dipakai untuk menggambar kotak area trigger secara interaktif -->
     <canvas id="overlay"></canvas>
   </div>
 </div>
 
+<!-- ===== Panel Kanan: Kontrol & Hasil ===== -->
 <div id="right-panel">
   <h2>1. Buka gambar halaman</h2>
+  <!-- Tombol pilih file: pengguna memilih file PNG/JPEG gambar halaman majalah dari komputer -->
   <input type="file" id="file-input" accept="image/png,image/jpeg">
 
+  <!-- Petunjuk cara menggambar area trigger -->
   <div class="hint">
     Klik lalu drag di atas gambar untuk menggambar kotak area trigger
     (tombol navigasi / teks yang bisa diklik). Bisa gambar berkali-kali
@@ -121,6 +142,7 @@
     supaya isi popupnya otomatis kembar tanpa isi ulang manual.
   </div>
 
+  <!-- Petunjuk cara menggunakan mode popup bergambar -->
   <div class="hint" style="background:#e8f4ff; border-color:#a9d3f5;">
     Untuk mode "Gambar": klik "Choose File" lalu pilih file PNG popup-nya
     (yang sudah kamu export dari Figma). Path-nya otomatis dibuat sebagai
@@ -131,41 +153,59 @@
   </div>
 
   <h2>2. Daftar trigger</h2>
+  <!-- Daftar kartu trigger yang sudah digambar; diisi otomatis oleh JavaScript -->
   <div id="trig-list"></div>
 
   <h2>3. Hasil (copy ke pages-data.js)</h2>
+  <!-- Area teks baca-saja yang menampilkan kode trigger siap tempel ke pages-data.js -->
   <textarea id="output" readonly></textarea>
   <button id="copy-btn">Copy ke Clipboard</button>
 </div>
 
 <script>
+// ===== Referensi Elemen HTML =====
+// Mengambil semua elemen yang dibutuhkan JavaScript
 const fileInput = document.getElementById("file-input");
 const img = document.getElementById("page-img");
 const overlay = document.getElementById("overlay");
+// ctx: "pensil" virtual untuk menggambar kotak di atas canvas
 const ctx = overlay.getContext("2d");
 const trigList = document.getElementById("trig-list");
 const output = document.getElementById("output");
 const copyBtn = document.getElementById("copy-btn");
 
+// ===== Variabel Status =====
+// Daftar semua area trigger yang sudah digambar: {type, left, top, width, height, image, imagePreviewUrl}
 let triggers = []; // {type, left, top, width, height, title, body}
+// Ukuran asli (piksel) gambar yang dimuat — dipakai untuk konversi ke persen
 let naturalW = 0, naturalH = 0;
+// Penanda apakah pengguna sedang menekan tombol mouse dan menggambar kotak
 let drawing = false;
+// Koordinat awal dan posisi mouse saat ini (dalam piksel canvas)
 let startX = 0, startY = 0, curX = 0, curY = 0;
 
+// ===== Pendengar: Memuat File Gambar =====
+// Saat pengguna memilih file gambar: tampilkan di panel kiri, atur ulang canvas dan daftar trigger
 fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  // Buat URL sementara untuk menampilkan file lokal tanpa mengunggahnya ke server
   const url = URL.createObjectURL(file);
   img.src = url;
   img.onload = () => {
     naturalW = img.naturalWidth;
     naturalH = img.naturalHeight;
     resizeOverlay();
+    // Reset daftar trigger setiap kali gambar baru dimuat
     triggers = [];
     renderList();
   };
 });
 
+// ===== Fungsi: Sinkronkan Ukuran Canvas dengan Gambar =====
+// Tujuan   : Membuat canvas selalu sama besar dengan gambar yang tampil di layar.
+//            Perlu dipanggil ulang setiap kali jendela browser diubah ukurannya.
+// Hasilnya : Canvas menimpa gambar dengan tepat, lalu gambar ulang kotak trigger.
 function resizeOverlay() {
   const rect = img.getBoundingClientRect();
   overlay.style.width = rect.width + "px";
@@ -177,8 +217,11 @@ function resizeOverlay() {
   overlay.style.top = "0";
   redraw();
 }
+// Perbarui canvas setiap kali ukuran jendela berubah (mis. saat orientasi HP berputar)
 window.addEventListener("resize", resizeOverlay);
 
+// ===== Pendengar: Menggambar Kotak Area Trigger =====
+// Saat tombol mouse ditekan di canvas: catat posisi awal gambar
 overlay.addEventListener("mousedown", (e) => {
   drawing = true;
   const r = overlay.getBoundingClientRect();
@@ -186,6 +229,7 @@ overlay.addEventListener("mousedown", (e) => {
   startY = e.clientY - r.top;
   curX = startX; curY = startY;
 });
+// Saat mouse bergerak sambil ditekan: perbarui posisi ujung kotak dan gambar ulang
 overlay.addEventListener("mousemove", (e) => {
   if (!drawing) return;
   const r = overlay.getBoundingClientRect();
@@ -193,6 +237,7 @@ overlay.addEventListener("mousemove", (e) => {
   curY = e.clientY - r.top;
   redraw();
 });
+// Saat tombol mouse dilepas: hitung koordinat persen lalu simpan trigger baru
 window.addEventListener("mouseup", () => {
   if (!drawing) return;
   drawing = false;
@@ -200,12 +245,15 @@ window.addEventListener("mouseup", () => {
   const h = Math.abs(curY - startY);
   if (w < 4 || h < 4) { redraw(); return; } // terlalu kecil, abaikan
 
+  // dispW/dispH: ukuran canvas yang tampil di layar (bisa berbeda dari ukuran asli gambar)
   const dispW = overlay.width, dispH = overlay.height;
+  // Konversi koordinat piksel ke persen agar posisi akurat di semua ukuran layar
   const left = Math.min(startX, curX) / dispW * 100;
   const top = Math.min(startY, curY) / dispH * 100;
   const width = w / dispW * 100;
   const height = h / dispH * 100;
 
+  // Simpan trigger baru dengan nilai default tipe "nav-next" (bisa diubah di panel kanan)
   triggers.push({
     type: "nav-next",
     left: +left.toFixed(1),
@@ -219,12 +267,18 @@ window.addEventListener("mouseup", () => {
   redraw();
 });
 
+// ===== Fungsi: Gambar Ulang Canvas =====
+// Tujuan   : Menghapus canvas lalu menggambar ulang semua kotak trigger (merah)
+//            dan kotak yang sedang digambar (biru) berdasarkan data terbaru.
+// Dipanggil: Setiap kali trigger berubah atau mouse bergerak saat menggambar.
 function redraw() {
   ctx.clearRect(0, 0, overlay.width, overlay.height);
+  // Warna merah untuk kotak trigger yang sudah tersimpan
   ctx.strokeStyle = "red";
   ctx.fillStyle = "rgba(255,0,0,0.25)";
   ctx.lineWidth = 2;
 
+  // Gambar semua trigger yang sudah ada (konversi dari persen ke piksel canvas)
   triggers.forEach((t) => {
     const x = t.left / 100 * overlay.width;
     const y = t.top / 100 * overlay.height;
@@ -234,6 +288,7 @@ function redraw() {
     ctx.strokeRect(x, y, w, h);
   });
 
+  // Gambar kotak biru yang sedang dalam proses digambar (saat mouse masih ditekan)
   if (drawing) {
     const x = Math.min(startX, curX);
     const y = Math.min(startY, curY);
@@ -244,9 +299,18 @@ function redraw() {
   }
 }
 
+// ===== Fungsi: Render Daftar Trigger di Panel Kanan =====
+// Tujuan   : Membuat ulang seluruh daftar kartu trigger di panel kanan.
+//            Setiap trigger ditampilkan sebagai kartu berisi dropdown tipe,
+//            input tambahan (sesuai tipe), koordinat, dan tombol hapus.
+// Dipanggil: Setiap kali trigger ditambah, dihapus, atau diubah.
+//
+// Catatan: Bagian innerHTML di dalam fungsi ini menggunakan template string (backtick);
+//          komentar tidak disisipkan di dalamnya sesuai aturan — penjelasan ada di sini.
 function renderList() {
   trigList.innerHTML = "";
   triggers.forEach((t, i) => {
+    // Cari trigger lain yang bertipe popup (untuk fitur "salin dari trigger lain")
     const otherPopupIndexes = triggers
       .map((tt, ii) => ({ tt, ii }))
       .filter(({ tt, ii }) => tt.type === "popup" && ii !== i);
@@ -294,6 +358,8 @@ function renderList() {
     trigList.appendChild(div);
   });
 
+  // ── Pendengar aksi untuk input file gambar popup ──
+  // Saat file gambar popup dipilih: simpan nama file dan buat URL preview-nya
   trigList.querySelectorAll('input[type="file"][data-field="imageFile"]').forEach((el) => {
     el.addEventListener("change", (e) => {
       const i = +e.target.dataset.i;
@@ -306,6 +372,8 @@ function renderList() {
     });
   });
 
+  // ── Pendengar aksi untuk semua input, select, dan textarea lainnya ──
+  // Memperbarui data trigger saat pengguna mengubah nilai di formulir
   trigList.querySelectorAll("select, input, textarea").forEach((el) => {
     if (el.type === "file") return; // sudah ditangani listener khusus di atas
     el.addEventListener("input", (e) => {
@@ -313,6 +381,7 @@ function renderList() {
       const field = e.target.dataset.field;
 
       if (field === "copyFrom") {
+        // Fitur salin popup dari trigger lain (untuk teks yang terpotong ganti baris)
         if (e.target.value !== "") {
           const src = triggers[+e.target.value];
           triggers[i].image = src.image;
@@ -333,9 +402,11 @@ function renderList() {
       renderOutput();
     });
   });
+  // ── Pendengar aksi untuk tombol hapus ──
   trigList.querySelectorAll("button.remove").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const i = +e.target.dataset.i;
+      // Hapus trigger dari array dan perbarui tampilan
       triggers.splice(i, 1);
       renderList();
       redraw();
@@ -345,6 +416,10 @@ function renderList() {
   renderOutput();
 }
 
+// ===== Fungsi: Hasilkan Kode Trigger =====
+// Tujuan   : Mengubah semua data trigger menjadi kode JavaScript siap tempel ke pages-data.js.
+// Dipanggil: Setiap kali trigger berubah (dari renderList).
+// Hasilnya : Teks di kotak "output" diperbarui.
 function renderOutput() {
   const lines = triggers.map((t) => {
     if (t.type === "popup") {
@@ -388,9 +463,13 @@ function renderOutput() {
   output.value = `triggers: [\n${lines.join(",\n")}\n    ]`;
 }
 
+// ===== Pendengar: Tombol Salin ke Clipboard =====
+// Saat tombol "Copy ke Clipboard" diklik: pilih semua teks di area output dan salin
 copyBtn.addEventListener("click", () => {
   output.select();
+  // execCommand("copy") adalah cara lama menyalin teks — masih didukung semua browser
   document.execCommand("copy");
+  // Ubah label tombol sementara sebagai konfirmasi bahwa teks berhasil disalin
   copyBtn.textContent = "Tersalin!";
   setTimeout(() => (copyBtn.textContent = "Copy ke Clipboard"), 1200);
 });

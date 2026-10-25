@@ -4,8 +4,12 @@
    Responsive: Mobile (<640px) | Tablet (640–1024px) | Desktop (>1024px)
    ============================================================ */
 
+/* Mengunduh font Outfit dari Google Fonts sebagai cadangan jika tag <link> di HTML belum memuat */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
+/* ── Reset Dasar ──────────────────────────────────────────── */
+/* Memastikan semua elemen menghitung lebar/tinggi termasuk padding & border,
+   dan menghapus margin/padding bawaan browser agar tampilan seragam */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,6 +17,8 @@
 }
 
 /* ── Body & Background ───────────────────────────────────── */
+/* Mengatur tampilan seluruh halaman: tinggi penuh layar, tanpa scroll di luar area majalah,
+   serta menumpuk isi secara vertikal (header di atas, konten di bawah) */
 body {
   height: 100vh;
   height: 100dvh; /* dynamic viewport height untuk browser mobile */
@@ -20,10 +26,12 @@ body {
   display: flex;
   flex-direction: column;
   font-family: 'Outfit', system-ui, Arial, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #f0f2f5; /* warna latar abu muda di sekitar gambar majalah */
 }
 
 /* ── Header ─────────────────────────────────────────────── */
+/* Mengatur bar paling atas: menempel di atas layar saat di-scroll (sticky),
+   selalu terlihat di depan konten lain (z-index tinggi), latar putih */
 #site-header {
   position: sticky;
   top: 0;
@@ -44,6 +52,7 @@ body {
 }
 
 /* Kiri: judul */
+/* Bagian kiri header — tempat judul majalah; min-width:0 mencegah teks mendorong toolbar keluar layar */
 #header-left {
   display: flex;
   align-items: center;
@@ -63,6 +72,7 @@ body {
   min-width: 0;
 }
 
+/* Teks judul majalah: tebal, warna gelap, terpotong otomatis (...) jika layar terlalu sempit */
 #header-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -74,6 +84,7 @@ body {
 }
 
 /* Kanan: toolbar */
+/* Bagian kanan header — tempat tombol-tombol navigasi, zoom, dan fullscreen */
 #header-toolbar {
   display: flex;
   align-items: center;
@@ -81,6 +92,7 @@ body {
   flex-shrink: 0;
 }
 
+/* Satu kelompok tombol dalam kotak abu-abu membulat (misal: kelompok zoom) */
 .toolbar-group {
   display: flex;
   align-items: center;
@@ -93,6 +105,7 @@ body {
   box-sizing: border-box;
 }
 
+/* Garis pemisah vertikal tipis di antara kelompok tombol */
 .toolbar-divider {
   width: 1px;
   height: 24px;
@@ -101,6 +114,7 @@ body {
   flex-shrink: 0;
 }
 
+/* Tampilan dasar semua tombol di toolbar: transparan, tanpa border, kursor pointer */
 .tool-btn {
   display: flex;
   align-items: center;
@@ -121,21 +135,25 @@ body {
   -webkit-tap-highlight-color: transparent; /* hapus highlight tap di mobile */
 }
 
+/* Efek saat kursor melayang di atas tombol: latar berubah sedikit lebih gelap */
 .tool-btn:hover {
   background: #eaecf0;
   color: #1a2236;
 }
 
+/* Efek saat tombol ditekan: latar semakin gelap sebagai umpan balik visual */
 .tool-btn:active {
   background: #dde1e8;
 }
 
+/* Gaya tombol saat dinonaktifkan: tampak pudar dan tidak bisa diklik */
 .tool-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
 /* Input & indikator halaman */
+/* Baris "3 / 48" di toolbar: indikator posisi halaman saat ini */
 #page-indicator {
   display: flex;
   align-items: center;
@@ -148,6 +166,7 @@ body {
   box-sizing: border-box;
 }
 
+/* Kotak input tempat pengguna mengetik nomor halaman tujuan */
 #page-input {
   width: 38px;
   height: 28px;
@@ -165,21 +184,26 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+/* Efek bingkai biru saat kotak input sedang aktif (diklik/difokus) */
 #page-input:focus {
   border-color: #7b90b2;
   box-shadow: 0 0 0 3px rgba(100, 130, 180, 0.12);
 }
 
+/* Karakter "/" pemisah antara nomor halaman dan total halaman — warnanya lebih pudar */
 .page-sep {
   color: #a0aab8;
   font-weight: 400;
 }
 
+/* Angka total halaman — warnanya sedikit lebih pudar agar terlihat sebagai keterangan, bukan angka aktif */
 #total-pages {
   color: #8a95a8;
 }
 
 /* ── Main area ───────────────────────────────────────────── */
+/* Area konten utama di bawah header: mengisi sisa ruang layar dan bisa di-scroll
+   jika gambar majalah lebih besar dari layar (misal saat zoom diperbesar) */
 #magazine-main {
   flex: 1;
   overflow: auto;
@@ -190,6 +214,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Pembungkus tengah: memastikan gambar halaman selalu tepat di tengah area putih */
 #magazine-wrapper {
   margin: auto;            /* sentralisasi vertikal & horizontal sempurna */
   min-width: 100%;
@@ -204,6 +229,8 @@ body {
 }
 
 /* Container halaman — ukuran diisi oleh script.js (fitContainer) */
+/* Kotak putih dengan bayangan yang menampung gambar halaman majalah;
+   ukuran pasti-nya diatur oleh JavaScript, bukan CSS */
 #page-container {
   position: relative;
   background: #fff;
@@ -216,6 +243,8 @@ body {
 }
 
 /* Loading Indicator */
+/* Lapisan putih yang menutupi container halaman saat gambar sedang diunduh;
+   hilang perlahan (fade) saat gambar siap */
 .page-loader {
   position: absolute;
   inset: 0;
@@ -229,21 +258,24 @@ body {
   transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
+/* Saat kelas "hidden" ditambahkan, loader tidak terlihat dan tidak menghalangi klik */
 .page-loader.hidden {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
+/* Lingkaran berputar (spinner) — menggunakan animasi CSS agar tidak butuh file GIF */
 .page-spinner {
   width: 28px;
   height: 28px;
   border: 3px solid #e2e8f0;
-  border-top-color: #2b6cb0;
+  border-top-color: #2b6cb0; /* satu sisi berwarna biru, menciptakan efek berputar */
   border-radius: 50%;
   animation: page-spin 0.75s linear infinite;
 }
 
+/* Teks kecil "Memuat halaman..." di bawah spinner */
 .loader-text {
   font-size: 0.8rem;
   font-weight: 500;
@@ -251,10 +283,12 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* Animasi putaran: dari posisi awal sampai 360 derajat, berulang terus */
 @keyframes page-spin {
   to { transform: rotate(360deg); }
 }
 
+/* Gambar halaman majalah: menutupi seluruh container, tidak bisa dipilih/diseret */
 #page-image {
   position: absolute;
   inset: 0;
@@ -267,6 +301,8 @@ body {
 }
 
 /* Trigger transparan di atas gambar */
+/* Area klik tak terlihat yang "menempel" di atas gambar halaman;
+   ukuran dan posisinya diatur oleh JavaScript berdasarkan data di pages-data.js */
 .trigger {
   position: absolute;
   cursor: pointer;
@@ -276,12 +312,16 @@ body {
   margin: 0;
 }
 
+/* Mode debug: trigger diwarnai merah transparan agar posisinya bisa dicek.
+   Aktif saat DEBUG_TRIGGERS = true di script.js */
 .trigger.debug {
   background: rgba(255, 0, 0, 0.35);
   outline: 1px dashed red;
 }
 
 /* ── Pop up ──────────────────────────────────────────────── */
+/* Lapisan gelap di belakang popup yang menutupi seluruh layar;
+   posisi fixed agar tetap di tempat meskipun konten di-scroll */
 #popup-overlay {
   position: fixed;
   inset: 0;
@@ -293,10 +333,12 @@ body {
   z-index: 200;
 }
 
+/* Saat popup ditutup, lapisan gelap ini disembunyikan sepenuhnya */
 #popup-overlay.hidden {
   display: none;
 }
 
+/* Kotak isi popup: muncul di tengah layar dengan animasi skala dari kecil ke normal */
 #popup-box {
   position: relative;
   background: #fff;
@@ -309,15 +351,18 @@ body {
   animation: popup-in 0.2s ease;
 }
 
+/* Animasi kemunculan popup: muncul dari sedikit lebih kecil lalu membesar ke ukuran penuh */
 @keyframes popup-in {
   from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* Judul popup disembunyikan jika popup hanya berisi gambar */
 #popup-title.hidden {
   display: none;
 }
 
+/* Judul teks di dalam popup */
 #popup-title {
   margin: 0 0 10px;
   font-size: 1.2rem;
@@ -325,12 +370,14 @@ body {
   color: #1a2236;
 }
 
+/* Isi teks popup: spasi baris 1.6 agar mudah dibaca */
 #popup-body {
   margin: 0;
   line-height: 1.6;
   color: #444;
 }
 
+/* Gambar di dalam popup: ukurannya menyesuaikan isi, dibatasi 85% lebar dan 75% tinggi layar */
 .popup-image {
   display: block;
   width: auto;
@@ -340,6 +387,7 @@ body {
   border-radius: 4px;
 }
 
+/* Tombol silang (×) di pojok kanan atas popup */
 #popup-close {
   position: absolute;
   top: 8px;
@@ -353,11 +401,14 @@ body {
   transition: color 0.15s;
 }
 
+/* Tombol silang menjadi gelap saat kursor melayang di atasnya */
 #popup-close:hover {
   color: #1a2236;
 }
 
 /* ── Tidak dipakai, disembunyikan ───────────────────────── */
+/* Elemen-elemen ini disiapkan tapi tidak digunakan di versi ini;
+   disembunyikan sepenuhnya agar tidak memakan ruang */
 #header-icon,
 #header-subtitle {
   display: none;
@@ -365,6 +416,8 @@ body {
 
 /* ============================================================
    RESPONSIVE — Tablet  (≤ 1024px)
+   Berlaku untuk layar selebar maksimum 1024px (iPad, tablet, laptop kecil).
+   Header sedikit lebih pendek, tombol lebih kecil, padding lebih rapat.
    ============================================================ */
 @media (max-width: 1024px) {
   #site-header {
@@ -404,6 +457,8 @@ body {
 
 /* ============================================================
    RESPONSIVE — Mobile Standar  (≤ 640px)
+   Berlaku untuk layar HP berukuran normal (lebar maksimum 640px).
+   Header lebih tipis, tombol zoom "100%" disembunyikan untuk hemat ruang.
    ============================================================ */
 @media (max-width: 640px) {
   #site-header {
@@ -474,6 +529,8 @@ body {
 
 /* ============================================================
    RESPONSIVE — Mobile L  (≤ 425px)
+   Berlaku untuk HP layar besar tapi belum masuk kategori tablet (lebar maksimum 425px).
+   Semua elemen toolbar diperkecil lagi; ikon SVG pun diperkecil.
    ============================================================ */
 @media (max-width: 425px) {
   #site-header {
@@ -538,6 +595,8 @@ body {
 
 /* ============================================================
    RESPONSIVE — Di Bawah Mobile M  (≤ 374px)
+   Berlaku untuk HP layar kecil-menengah (lebar maksimum 374px, mis. iPhone SE lama).
+   Garis pemisah (toolbar-divider) dihilangkan agar ruang lebih lapang.
    ============================================================ */
 @media (max-width: 374px) {
   #site-header {
@@ -607,6 +666,8 @@ body {
 
 /* ============================================================
    RESPONSIVE — Mobile Sangat Kecil / Mobile S  (≤ 330px)
+   Berlaku untuk HP berukuran sangat kecil (lebar maksimum 330px).
+   Semua elemen toolbar dibuat sekecil mungkin agar masih muat.
    ============================================================ */
 @media (max-width: 330px) {
   #site-header {
@@ -671,9 +732,12 @@ body {
 
 /* ============================================================
    Efek Balik Halaman (Page Flip) — 3D CSS
+   Sekumpulan aturan ini bekerja sama dengan JavaScript (goToPage)
+   untuk menciptakan animasi halaman seperti membalik buku sungguhan.
    ============================================================ */
 
 /* perspective hanya aktif saat animasi berlangsung */
+/* Mengaktifkan ruang 3D sementara: semakin besar nilainya, efek 3D semakin datar/jauh */
 #page-container.flipping {
   perspective: 2200px;
 }
@@ -688,6 +752,7 @@ body {
   display: none;
 }
 
+/* Elemen yang melakukan gerakan flip: menutupi seluruh container, diputar di CSS 3D */
 .flipper {
   position: absolute;
   inset: 0;
@@ -699,6 +764,7 @@ body {
   box-shadow: none; /* hapus bayangan hitam di sebelah kiri saat membalik */
 }
 
+/* Sisi (muka dan belakang) dari flipper — masing-masing tidak menampilkan sisi kebalikannya */
 .flip-face {
   position: absolute;
   inset: 0;
@@ -706,6 +772,7 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
+/* Sisi depan flipper: menampilkan gambar halaman yang sedang bergerak */
 .flip-front img {
   width: 100%;
   height: 100%;
@@ -714,6 +781,7 @@ body {
 }
 
 /* sisi belakang kertas saat halaman sudah terbalik */
+/* Diputar 180 derajat agar awalnya tersembunyi; latar putih kusam seperti kertas */
 .flip-back {
   transform: rotateY(180deg);
   background: #fafafa;

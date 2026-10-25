@@ -1,238 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <meta
-      name="description"
-      content="E-Magazine SCI-COOK - Majalah digital interaktif sains dan kuliner"
-    />
-    <title>E-Magazine SCI-COOK</title>
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="style.css"
-    />
-  </head>
 
-  <body>
-    <!-- ===== HEADER ===== -->
-    <header id="site-header">
-      <div id="header-left">
-        <div id="header-logo">
-          <div id="header-titles">
-            <h1 id="header-title">E-Magazine SCI-COOK</h1>
-          </div>
+<head>
+  <!-- Pengkodean karakter UTF-8: memastikan huruf Indonesia (é, ö, dll.) tampil benar -->
+  <meta charset="UTF-8">
+  <!-- Viewport: membuat tampilan pas di layar HP/tablet, tidak perlu di-zoom manual oleh pengguna -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Deskripsi singkat halaman: berguna agar hasil pencarian Google menampilkan keterangan yang tepat -->
+  <meta name="description" content="E-Magazine SCI-COOK - Majalah digital interaktif sains dan kuliner">
+  <!-- Judul yang muncul di tab browser -->
+  <title>E-Magazine SCI-COOK</title>
+  <!-- Pra-hubungkan ke server Google Fonts agar font lebih cepat diunduh -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Mengunduh font "Outfit" dari Google — dipakai untuk semua teks di website ini -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- File CSS yang mengatur tampilan/gaya seluruh halaman -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <!-- Header: bagian paling atas layar, berisi judul majalah dan tombol-tombol kontrol -->
+  <header id="site-header">
+    <!-- Sisi kiri header: tempat nama/judul majalah -->
+    <div id="header-left">
+      <div id="header-logo">
+        <div id="header-titles">
+          <!-- Judul utama majalah yang tampil di sudut kiri atas -->
+          <h1 id="header-title">E-Magazine SCI-COOK</h1>
         </div>
-      </div>
-
-      <div id="header-toolbar">
-        <!-- Navigasi Halaman -->
-        <div
-          class="toolbar-group"
-          id="nav-group"
-        >
-          <div id="page-indicator">
-            <input
-              id="page-input"
-              type="text"
-              value="1"
-              title="Ketik nomor halaman lalu tekan Enter"
-              autocomplete="off"
-            />
-            <span class="page-sep">/</span>
-            <span id="total-pages">1</span>
-          </div>
-        </div>
-
-        <div class="toolbar-divider"></div>
-
-        <!-- Zoom -->
-        <div
-          class="toolbar-group"
-          id="zoom-group"
-        >
-          <button
-            class="tool-btn"
-            id="btn-zoom-out"
-            title="Perkecil (Zoom Out)"
-            onclick="handleZoom(-0.1)"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="8"
-              ></circle>
-              <line
-                x1="21"
-                y1="21"
-                x2="16.65"
-                y2="16.65"
-              ></line>
-              <line
-                x1="8"
-                y1="11"
-                x2="14"
-                y2="11"
-              ></line>
-            </svg>
-          </button>
-          <button
-            class="tool-btn"
-            id="btn-zoom-reset"
-            title="Reset Zoom (100%)"
-            onclick="handleZoom(0)"
-          >
-            100%
-          </button>
-          <button
-            class="tool-btn"
-            id="btn-zoom-in"
-            title="Perbesar (Zoom In)"
-            onclick="handleZoom(0.1)"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="8"
-              ></circle>
-              <line
-                x1="21"
-                y1="21"
-                x2="16.65"
-                y2="16.65"
-              ></line>
-              <line
-                x1="11"
-                y1="8"
-                x2="11"
-                y2="14"
-              ></line>
-              <line
-                x1="8"
-                y1="11"
-                x2="14"
-                y2="11"
-              ></line>
-            </svg>
-          </button>
-        </div>
-
-        <div class="toolbar-divider"></div>
-
-        <!-- Fullscreen -->
-        <div class="toolbar-group">
-          <button
-            class="tool-btn"
-            id="btn-fullscreen"
-            title="Layar Penuh"
-            onclick="handleFullscreen()"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <polyline points="9 21 3 21 3 15"></polyline>
-              <line
-                x1="21"
-                y1="3"
-                x2="14"
-                y2="10"
-              ></line>
-              <line
-                x1="3"
-                y1="21"
-                x2="10"
-                y2="14"
-              ></line>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </header>
-    <!-- ===== END HEADER ===== -->
-
-    <main id="magazine-main">
-      <div id="magazine-wrapper">
-        <div id="page-container">
-          <!-- Loader indikator saat gambar belum selesai diunduh -->
-          <div
-            id="page-loader"
-            class="page-loader hidden"
-          >
-            <div class="page-spinner"></div>
-            <span class="loader-text">Memuat halaman...</span>
-          </div>
-          <img
-            id="page-image"
-            src=""
-            alt="Halaman e-magazine"
-          />
-          <!-- trigger transparan digenerate otomatis lewat script.js -->
-        </div>
-      </div>
-    </main>
-
-    <!-- Pop up untuk teks yang bisa diklik -->
-    <div
-      id="popup-overlay"
-      class="hidden"
-    >
-      <div id="popup-box">
-        <button
-          id="popup-close"
-          aria-label="Tutup"
-        >
-          &times;
-        </button>
-        <h2 id="popup-title"></h2>
-        <p id="popup-body"></p>
       </div>
     </div>
 
-    <script src="pages-data.js"></script>
-    <script src="script.js"></script>
-  </body>
+    <!-- Sisi kanan header: kumpulan tombol kontrol (toolbar) -->
+    <div id="header-toolbar">
+      <!-- Navigasi Halaman -->
+      <!-- Kotak kecil yang menampilkan nomor halaman aktif dan total halaman, contoh: "3 / 48" -->
+      <div class="toolbar-group" id="nav-group">
+        <div id="page-indicator">
+          <!-- Kotak input: pengguna bisa mengetik nomor halaman lalu tekan Enter untuk langsung lompat ke halaman itu -->
+          <input id="page-input" type="text" value="1" title="Ketik nomor halaman lalu tekan Enter" autocomplete="off">
+          <!-- Garis pemisah "/" antara nomor halaman aktif dan total halaman -->
+          <span class="page-sep">/</span>
+          <!-- Total jumlah halaman; diisi otomatis oleh script.js saat halaman pertama kali dimuat -->
+          <span id="total-pages">1</span>
+        </div>
+      </div>
+
+      <!-- Garis pemisah tipis vertikal antar kelompok tombol -->
+      <div class="toolbar-divider"></div>
+
+      <!-- Zoom -->
+      <!-- Tombol untuk memperbesar, mereset, atau memperkecil tampilan halaman majalah -->
+      <div class="toolbar-group" id="zoom-group">
+        <!-- Tombol perkecil: memanggil handleZoom(-0.1), artinya kurangi zoom sebesar 10% -->
+        <button class="tool-btn" id="btn-zoom-out" title="Perkecil (Zoom Out)" onclick="handleZoom(-0.1)">
+          <!-- Ikon kaca pembesar dengan tanda minus (SVG = gambar vektor, tidak butuh file gambar terpisah) -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+        <!-- Tombol reset zoom: kembali ke ukuran 100%; label persentasenya diperbarui oleh script.js setiap zoom berubah -->
+        <button class="tool-btn" id="btn-zoom-reset" title="Reset Zoom (100%)" onclick="handleZoom(0)">100%</button>
+        <!-- Tombol perbesar: memanggil handleZoom(0.1), artinya tambah zoom sebesar 10% -->
+        <button class="tool-btn" id="btn-zoom-in" title="Perbesar (Zoom In)" onclick="handleZoom(0.1)">
+          <!-- Ikon kaca pembesar dengan tanda plus -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Garis pemisah tipis vertikal -->
+      <div class="toolbar-divider"></div>
+
+      <!-- Fullscreen -->
+      <!-- Tombol untuk masuk atau keluar dari mode layar penuh -->
+      <div class="toolbar-group">
+        <button class="tool-btn" id="btn-fullscreen" title="Layar Penuh" onclick="handleFullscreen()">
+          <!-- Ikon panah empat sudut (expand/perluas layar) -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- ===== END HEADER ===== -->
+
+  <!-- Area utama tempat gambar halaman majalah ditampilkan -->
+  <main id="magazine-main">
+    <!-- Pembungkus tengah: memastikan gambar halaman selalu berada di tengah layar secara horizontal dan vertikal -->
+    <div id="magazine-wrapper">
+      <!-- Container halaman: ukurannya diatur otomatis oleh fungsi fitContainer() di script.js
+           sesuai rasio gambar halaman dan ukuran layar yang tersedia -->
+      <div id="page-container">
+        <!-- Loader indikator saat gambar belum selesai diunduh -->
+        <div id="page-loader" class="page-loader hidden">
+          <div class="page-spinner"></div>
+          <span class="loader-text">Memuat halaman...</span>
+        </div>
+        <!-- Elemen gambar yang menampilkan halaman majalah; atribut src-nya diganti oleh script.js setiap pindah halaman -->
+        <img id="page-image" src="" alt="Halaman e-magazine">
+        <!-- trigger transparan digenerate otomatis lewat script.js -->
+        <!-- Area klik tak terlihat (transparan) dibuat di atas gambar oleh script.js
+             agar bagian tertentu dari gambar halaman bisa diklik untuk navigasi atau memunculkan popup -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Pop up untuk teks yang bisa diklik -->
+  <!-- Lapisan gelap semi-transparan di belakang popup; klik area gelap ini akan menutup popup -->
+  <div id="popup-overlay" class="hidden">
+    <!-- Kotak popup putih yang berisi konten (gambar atau teks penjelasan) -->
+    <div id="popup-box">
+      <!-- Tombol silang (×) di sudut kanan atas untuk menutup popup -->
+      <button id="popup-close" aria-label="Tutup">&times;</button>
+      <!-- Judul popup; disembunyikan jika popup hanya berisi gambar (tanpa judul teks) -->
+      <h2 id="popup-title"></h2>
+      <!-- Isi popup: bisa berupa gambar atau teks, diisi oleh script.js saat popup dibuka -->
+      <p id="popup-body"></p>
+    </div>
+  </div>
+
+  <!-- Data halaman (daftar gambar, posisi area klik, dll.) dimuat lebih dulu sebelum script utama,
+       karena script.js membutuhkan variabel PAGES yang ada di dalam pages-data.js -->
+  <script src="pages-data.js"></script>
+  <!-- Script utama yang menjalankan semua logika majalah: navigasi, zoom, popup, animasi balik halaman, dll. -->
+  <script src="script.js"></script>
+</body>
+
 </html>

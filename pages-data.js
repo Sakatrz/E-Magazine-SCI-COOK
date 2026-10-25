@@ -7,6 +7,65 @@
 //   4. Atur tipe & isi popup di panel kanan
 //   5. Copy hasil dari kotak "Hasil" lalu tempel ke properti "triggers" di bawah
 
+// ===== Panduan Isian Data Halaman =====
+//
+// Setiap halaman majalah diwakili oleh satu objek JavaScript di dalam array PAGES.
+//
+// Properti setiap objek halaman:
+//   id       — Nama unik halaman (huruf dan tanda hubung), hanya untuk referensi internal.
+//   image    — Path (alamat) file gambar halaman, relatif terhadap folder proyek.
+//   ratio    — Rasio lebar÷tinggi gambar (mis. 1202/1698). Dipakai untuk menghitung
+//              ukuran container agar gambar tidak terdistorsi di layar apapun.
+//              TODO di beberapa baris berarti rasio belum dikonfirmasi dengan gambar aslinya.
+//
+//   triggers — Daftar area klik tak terlihat yang diletakkan di atas gambar halaman.
+//              Setiap trigger adalah sebuah objek dengan properti:
+//
+//     type     — Jenis aksi saat area diklik. Nilai yang mungkin:
+//                "nav-next"  → pindah ke halaman berikutnya
+//                "nav-prev"  → pindah ke halaman sebelumnya
+//                "nav-page"  → lompat ke nomor halaman tertentu (butuh properti "page")
+//                "link"      → buka URL di tab baru (butuh properti "url")
+//                "popup"     → tampilkan popup gambar/teks (butuh properti "popup")
+//
+//     left     — Jarak tepi kiri area klik dari tepi kiri gambar, dalam PERSEN (%).
+//     top      — Jarak tepi atas area klik dari tepi atas gambar, dalam PERSEN (%).
+//     width    — Lebar area klik, dalam PERSEN (%).
+//     height   — Tinggi area klik, dalam PERSEN (%).
+//                (Semua dalam persen agar otomatis menyesuaikan ukuran gambar di berbagai layar)
+//
+//     page     — (Hanya untuk nav-page) Nomor halaman tujuan, dihitung mulai dari 1.
+//     url      — (Hanya untuk link) Alamat web yang akan dibuka.
+//     popup    — (Hanya untuk popup) Objek berisi:
+//                  image  → path file gambar yang ditampilkan dalam popup
+//                  alt    → teks alternatif gambar (opsional)
+//                  title  → judul teks jika tidak menggunakan gambar (opsional)
+//                  body   → isi teks jika tidak menggunakan gambar (opsional)
+//
+// ─── Contoh satu entri halaman ──────────────────────────────────────────────
+// {
+//   id: "cover",                  // nama unik halaman
+//   image: "images/cover.png",    // file gambar
+//   ratio: 1202 / 1698,           // lebar asli ÷ tinggi asli gambar
+//   triggers: [
+//     {
+//       type: "nav-next",         // klik area ini → pindah ke halaman berikutnya
+//       left: 81.6,               // mulai 81.6% dari kiri
+//       top: 87.9,                // mulai 87.9% dari atas
+//       width: 15.0,              // selebar 15%
+//       height: 4.1,              // setinggi 4.1%
+//     },
+//     {
+//       type: "popup",            // klik area ini → tampilkan popup gambar
+//       left: 10, top: 20, width: 30, height: 5,
+//       popup: { image: "images/popups/contoh.png" }
+//     },
+//   ],
+// }
+// ────────────────────────────────────────────────────────────────────────────
+// Penjelasan individual setiap entri di bawah ini TIDAK diberikan satu per satu
+// karena strukturnya identik — cukup baca panduan di atas untuk memahami semuanya.
+
 const PAGES = [
   {
     id: "cover",

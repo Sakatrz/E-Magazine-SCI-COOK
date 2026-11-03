@@ -132,6 +132,12 @@ function handleFullscreen() {
   }
 }
 
+// Kembali ke halaman daftar isi berdasarkan ID halaman di pages-data.js.
+function handleContents() {
+  const contentsIndex = PAGES.findIndex((page) => page.id === "daftar-isi");
+  if (contentsIndex >= 0) goToPage(contentsIndex);
+}
+
 // ===== Pra-unduh Gambar (Smart Image Preloading) =====
 // ── Smart Image Preloading ──────────────────────────────────
 // Mendownload gambar halaman & popup di latar belakang (background)
@@ -448,7 +454,7 @@ document.addEventListener("keydown", (e) => {
   // Jangan jalankan navigasi halaman kalau user sedang mengetik di input
   if (document.activeElement === elPageInput) return;
   if (e.key === "ArrowRight") goToPage(currentPageIndex + 1);
-  if (e.key === "ArrowLeft")  goToPage(currentPageIndex - 1);
+  if (e.key === "ArrowLeft") goToPage(currentPageIndex - 1);
   if (e.key === "Escape") closePopup();
 });
 

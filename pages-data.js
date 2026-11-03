@@ -432,20 +432,28 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
+        type: "popup",
+        left: 42.4,
+        top: 79.1,
+        width: 18.9,
+        height: 9.9,
+        popup: { image: "images/popups/H5-TOMBOL MERAH  BAWAH.png" }
+      },
+      {
         type: "nav-next",
-        left: 85.5,
-        top: 92.9,
-        width: 8,
-        height: 2.4,
+        left: 79,
+        top: 90.5,
+        width: 20.9,
+        height: 7.4
       },
       {
         type: "nav-prev",
-        left: 7.7,
-        top: 93,
-        width: 8.2,
-        height: 2.4,
-      },
-    ],
+        left: 1,
+        top: 91.1,
+        width: 21.7,
+        height: 7
+      }
+    ]
   },
   {
     id: "h6",

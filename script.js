@@ -45,7 +45,7 @@ const DEFAULT_RATIO = 210 / 297; // fallback A4 kalau halaman belum punya ratio
 // Tujuan   : Menghitung ukuran kotak halaman (dalam piksel) agar setinggi-lebarnya
 //            yang mungkin tanpa melebihi ruang layar, sambil menjaga rasio gambar.
 // Dipanggil: Setiap kali layar di-resize, zoom berubah, atau halaman berganti.
-// Hasilnya : Lebar dan tinggi elemen #page-container diperbarui di CSS.
+// Hasilnya : Lebar dan tinggi elemen #page-container diatur lewat style langsung dari JavaScript.
 //
 // Menghitung ukuran container (dalam pixel) sebesar mungkin tanpa
 // melebihi ruang yang tersedia, sambil menjaga rasio halaman saat ini.
@@ -254,6 +254,9 @@ async function goToPage(target) {
 
   isFlipping = true;
 
+  // Hentikan video halaman lama sekarang juga, supaya suaranya tidak terus jalan selama animasi
+  unmountPageVideos();
+
   // Preload gambar halaman tujuan sebelum animasi (agar tidak blank)
   // Menunggu (await) hingga gambar selesai diunduh sebelum animasi dimulai
   await new Promise((resolve) => {
@@ -279,7 +282,8 @@ async function goToPage(target) {
 
   flipper.style.transitionProperty = "transform, opacity";
   flipper.style.transitionDuration = FLIP_DURATION + "ms, 250ms";
-  // Saat maju: opacity mulai langsung; saat mundur: tidak ada jeda
+  // Maju: transparansi (opacity) baru mulai memudar setelah 550ms (di akhir putaran).
+  // Mundur: tanpa jeda.
   flipper.style.transitionDelay = goingNext ? "0ms, 550ms" : "0ms, 0ms";
   flipper.style.transform = goingNext ? "rotateY(-180deg)" : "rotateY(0deg)";
   flipper.style.opacity = goingNext ? "0" : "1";
@@ -290,15 +294,118 @@ async function goToPage(target) {
     flipper.remove();
     pageContainer.classList.remove("flipping");
     isFlipping = false;
+    // Animasi sudah selesai → sekarang video halaman tujuan boleh dipasang dan langsung diputar
+    mountPageVideos(PAGES[currentPageIndex]);
   }, FLIP_DURATION + 60); // +60ms sebagai jeda kecil agar animasi benar-benar tuntas
+}
+
+// ===== Video YouTube di Halaman =====
+// Cara kerja : trigger bertipe "video" di pages-data.js bukan tombol, melainkan kotak pemutar
+//              YouTube yang diletakkan di atas gambar halaman (posisinya dalam persen,
+//              sama seperti trigger lain, jadi ikut mengecil/membesar mengikuti layar dan zoom).
+// Kapan main : video dipasang SETELAH animasi balik halaman selesai, lalu otomatis diputar.
+//              Saat pembaca meninggalkan halaman, video dibuang sehingga suaranya berhenti.
+// Catatan    : Pembaca sudah mengklik/menekan tombol sebelum sampai di halaman ini, sehingga
+//              browser biasanya mengizinkan autoplay dengan suara. Kalau browser tetap
+//              memblokir (mis. beberapa iPhone), YouTube menampilkan tombol play.
+//              Opsi mute: true pada trigger membuat video selalu bisa autoplay (tanpa suara).
+
+// Tujuan   : Mengambil ID video YouTube (11 karakter) dari ID polos atau dari bentuk link apa pun.
+// Parameter: input — contoh: "dQw4w9WgXcQ", "https://youtu.be/dQw4w9WgXcQ",
+//            "https://www.youtube.com/watch?v=dQw4w9WgXcQ", atau link embed/shorts.
+// Hasilnya : ID video, atau teks kosong ("") jika tidak dikenali.
+function extractYouTubeId(input) {
+  if (!input) return "";
+  const text = String(input).trim();
+  const isId = (v) => /^[\w-]{11}$/.test(v || "");
+  if (isId(text)) return text; // sudah berupa ID
+  try {
+    const url = new URL(text);
+    if (url.hostname.includes("youtu.be")) {
+      const id = url.pathname.slice(1).split("/")[0];
+      if (isId(id)) return id;
+    }
+    const v = url.searchParams.get("v");
+    if (isId(v)) return v;
+    const m = url.pathname.match(/\/(?:embed|shorts|live)\/([\w-]{11})/);
+    if (m) return m[1];
+  } catch (e) {
+    // bukan link yang valid → abaikan, lanjut mengembalikan ""
+  }
+  return "";
+}
+
+// Tujuan   : Menyusun alamat pemutar YouTube lengkap dengan pengaturannya.
+// Parameter: id — ID video; trigger — data trigger (boleh berisi autoplay, mute, loop).
+// Hasilnya : Alamat embed, contoh: https://www.youtube.com/embed/ID?autoplay=1&mute=0&...
+function buildYouTubeUrl(id, trigger) {
+  const params = new URLSearchParams({
+    autoplay: trigger.autoplay === false ? "0" : "1", // 1 = langsung diputar
+    mute: trigger.mute ? "1" : "0",                   // 1 = mulai tanpa suara
+    playsinline: "1",                                 // di iPhone: putar di dalam halaman, bukan layar penuh
+    rel: "0",                                         // saran video di akhir hanya dari channel yang sama
+    modestbranding: "1",                              // logo YouTube lebih kecil
+  });
+  if (trigger.loop) {
+    // Agar bisa diulang, YouTube mewajibkan parameter playlist berisi ID yang sama
+    params.set("loop", "1");
+    params.set("playlist", id);
+  }
+  return "https://www.youtube.com/embed/" + id + "?" + params.toString();
+}
+
+// Tujuan   : Menghentikan dan membuang semua pemutar video di halaman (iframe dihapus = video berhenti).
+// Dipanggil: Dari renderPage() dan goToPage() sebelum pindah halaman.
+function unmountPageVideos() {
+  document.querySelectorAll(".page-video").forEach((el) => el.remove());
+}
+
+// Tujuan   : Memasang pemutar YouTube untuk setiap trigger bertipe "video" milik satu halaman.
+// Parameter: page — objek halaman dari PAGES.
+// Dipanggil: Dari renderPage() (jika tidak sedang animasi) dan dari goToPage() setelah animasi selesai.
+// Hasilnya : Elemen .page-video berisi iframe YouTube, diletakkan di atas gambar halaman.
+function mountPageVideos(page) {
+  unmountPageVideos(); // pastikan tidak ada video ganda
+  if (!page || !page.triggers) return;
+
+  page.triggers.forEach((trigger) => {
+    if (trigger.type !== "video") return;
+    const id = extractYouTubeId(trigger.youtube);
+    if (!id) return; // link/ID tidak dikenali → lewati
+
+    // Kotak pembungkus: posisi dan ukuran dalam persen, sama seperti trigger lain
+    const box = document.createElement("div");
+    box.className = "page-video";
+    box.style.left = trigger.left + "%";
+    box.style.top = trigger.top + "%";
+    box.style.width = trigger.width + "%";
+    box.style.height = trigger.height + "%";
+
+    const frame = document.createElement("iframe");
+    frame.src = buildYouTubeUrl(id, trigger);
+    frame.title = trigger.title || "Video";
+    // allow="autoplay": izin agar pemutar YouTube boleh langsung memutar (termasuk dengan suara)
+    frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    frame.allowFullscreen = true;
+    // YouTube membutuhkan informasi asal situs; nilai ini mengirimkannya dengan aman
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+
+    box.appendChild(frame);
+    pageContainer.appendChild(box);
+  });
 }
 
 // ===== Render Halaman =====
 // Tujuan   : Menampilkan gambar halaman ke layar dan membuat ulang semua area klik
 //            (trigger) di atas gambar sesuai data halaman tersebut.
+//            Video YouTube milik halaman itu (jika ada) ikut dipasang, tetapi hanya
+//            bila tidak sedang ada animasi balik halaman (kalau ada, video dipasang
+//            oleh goToPage setelah animasi selesai).
 // Parameter: index — indeks halaman yang akan ditampilkan (0-based).
-// Dipanggil: Saat pertama kali halaman dibuka, saat navigasi nav-page,
-//            dan setelah animasi flip selesai.
+// Dipanggil: Saat pertama kali halaman dibuka, saat navigasi nav-page, dari kotak
+//            nomor halaman (navigateFromInput), dari goToPage (saat maju: sebelum
+//            animasi, di bawah kertas yang berputar; saat mundur: setelah animasi),
+//            dan saat mode reduced-motion aktif.
 function renderPage(index) {
   const page = PAGES[index];
   if (!page) return;
@@ -341,9 +448,14 @@ function renderPage(index) {
   // hapus trigger halaman sebelumnya
   document.querySelectorAll(".trigger").forEach((el) => el.remove());
 
+  // hentikan dan buang video halaman sebelumnya (supaya suaranya berhenti)
+  unmountPageVideos();
+
   // buat ulang trigger sesuai data halaman ini
   // Setiap trigger menjadi satu elemen <button> tak terlihat di atas gambar
   page.triggers.forEach((trigger) => {
+    // Trigger bertipe "video" bukan tombol; ia dipasang terpisah oleh mountPageVideos()
+    if (trigger.type === "video") return;
     const el = document.createElement("button");
     el.className = "trigger";
     // Jika mode debug aktif, tambahkan kelas "debug" agar area klik terlihat merah
@@ -359,6 +471,10 @@ function renderPage(index) {
     el.addEventListener("click", () => handleTriggerClick(trigger));
     pageContainer.appendChild(el);
   });
+
+  // Pasang video halaman ini sekarang, kecuali sedang ada animasi balik halaman
+  // (kalau ada, goToPage yang memasangnya setelah animasi selesai)
+  if (!isFlipping) mountPageVideos(page);
 }
 
 // ===== Penanganan Klik Area Trigger =====
@@ -457,7 +573,7 @@ window.addEventListener("resize", fitContainer);
 
 // ===== Navigasi via Input Halaman =====
 // ── Navigasi via input halaman ────────────────────────────────
-// - Ketik angka → otomatis pindah setelah 600ms berhenti mengetik (debounce)
+// - Ketik angka → otomatis pindah setelah 1200ms berhenti mengetik (debounce)
 // - Enter → pindah langsung tanpa menunggu
 // - Escape / klik luar → batal, nilai kembali ke halaman saat ini
 // Penanda timeout debounce; dipakai untuk membatalkan perpindahan otomatis jika user masih mengetik.

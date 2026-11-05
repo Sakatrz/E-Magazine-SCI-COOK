@@ -1,4 +1,4 @@
-// pages-data.js
+﻿// pages-data.js
 //
 // Cara isi halaman yang masih kosong (2,3,4,5,6,7,8,9):
 //   1. Buka tools/trigger-picker.html di browser
@@ -27,6 +27,8 @@
 //                "nav-page"  → lompat ke nomor halaman tertentu (butuh properti "page")
 //                "link"      → buka URL di tab baru (butuh properti "url")
 //                "popup"     → tampilkan popup gambar/teks (butuh properti "popup")
+//                "video"     → pemutar YouTube di atas gambar, otomatis diputar saat halaman dibuka
+//                              (butuh properti "youtube"; opsi: mute, loop, autoplay: false)
 //
 //     left     — Jarak tepi kiri area klik dari tepi kiri gambar, dalam PERSEN (%).
 //     top      — Jarak tepi atas area klik dari tepi atas gambar, dalam PERSEN (%).
@@ -777,6 +779,16 @@ const PAGES = [
         top: 91,
         width: 18.7,
         height: 6.3,
+      },
+      {
+        type: "video",
+        left: 40.2,
+        top: 30.4,
+        width: 16.3,
+        height: 14.4,
+        youtube: "https://youtu.be/prt5w9jwCl0?si=SGV3Lqe4PuG1f6pN",
+        mute: true,
+        loop: true
       },
     ],
   },
@@ -1706,19 +1718,19 @@ const PAGES = [
 // klik lanjut/kembali ghoib
 const HIDDEN_NAV_TRIGGERS = [
   {
-        type: "nav-next",
-        left: 89.7,
-        top: 0,
-        width: 10.1,
-        height: 99.9
-      },
-      {
-        type: "nav-prev",
-        left: 0.3,
-        top: 0.1,
-        width: 9.9,
-        height: 99.4
-      }
+    type: "nav-next",
+    left: 89.7,
+    top: 0,
+    width: 10.1,
+    height: 99.9
+  },
+  {
+    type: "nav-prev",
+    left: 0.3,
+    top: 0.1,
+    width: 9.9,
+    height: 99.4
+  }
 ];
 
 PAGES.forEach((page) => {

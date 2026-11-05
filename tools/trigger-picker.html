@@ -325,6 +325,7 @@ function renderList() {
         <option value="nav-page" ${t.type === "nav-page" ? "selected" : ""}>nav-page (daftar isi / lompat halaman)</option>
         <option value="link" ${t.type === "link" ? "selected" : ""}>link (buka URL web eksternal)</option>
         <option value="popup" ${t.type === "popup" ? "selected" : ""}>popup (teks diklik)</option>
+        <option value="video" ${t.type === "video" ? "selected" : ""}>video (YouTube, otomatis diputar)</option>
       </select>
 
       ${t.type === "nav-page" ? `
@@ -335,6 +336,13 @@ function renderList() {
       ${t.type === "link" ? `
         <label>URL Tujuan (link web)</label>
         <input type="url" data-i="${i}" data-field="url" value="${t.url || ''}" placeholder="https://www.educaplay.com/...">
+      ` : ""}
+
+      ${t.type === "video" ? `
+        <label>Link YouTube (atau ID video)</label>
+        <input type="text" data-i="${i}" data-field="youtube" value="${t.youtube || ''}" placeholder="https://youtu.be/xxxxxxxxxxx">
+        <label style="font-weight:400;"><input type="checkbox" data-i="${i}" data-field="mute" ${t.mute ? "checked" : ""} style="width:auto;"> Mulai tanpa suara (pasti autoplay di semua HP)</label>
+        <label style="font-weight:400;"><input type="checkbox" data-i="${i}" data-field="loop" ${t.loop ? "checked" : ""} style="width:auto;"> Ulangi terus (loop)</label>
       ` : ""}
 
       ${t.type === "popup" ? `
@@ -391,7 +399,8 @@ function renderList() {
         return;
       }
 
-      triggers[i][field] = e.target.value;
+      // Kotak centang (mute/loop) menyimpan true/false; input lain menyimpan teksnya
+      triggers[i][field] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
       if (field === "type") {
         // Set default nilai jika field berganti
         if (e.target.value === "nav-page" && !triggers[i].page) triggers[i].page = 1;
@@ -450,6 +459,18 @@ function renderOutput() {
         width: ${t.width},
         height: ${t.height},
         url: "${(t.url || "").replace(/"/g, '\\"')}"
+      }`;
+    }
+    if (t.type === "video") {
+      // Opsi mute/loop hanya ditulis jika dicentang, supaya hasilnya ringkas
+      const extra = (t.mute ? ",\n        mute: true" : "") + (t.loop ? ",\n        loop: true" : "");
+      return `      {
+        type: "video",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        youtube: "${(t.youtube || "").replace(/"/g, '\\"')}"${extra}
       }`;
     }
     return `      {

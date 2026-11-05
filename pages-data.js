@@ -797,20 +797,12 @@ const PAGES = [
         height: 6.3,
       },
       {
-        type: "video",
-        left: 40.7,
-        top: 29.7,
-        width: 49.7,
-        height: 23.5,
-        youtube: "https://youtu.be/prt5w9jwCl0?si=p5Plc-ATQgn5qxhz",
-      },
-      {
         type: "popup",
         left: 29.8,
-        top: 69,
-        width: 44.8,
-        height: 20.2,
-        popup: { video: "videos/test.mp4" }
+        top: 68.7,
+        width: 44.6,
+        height: 20.6,
+        popup: { video: "https://youtu.be/GIQ3_lRhYzg?si=ERF9A8e52363bUqW" }
       },
     ],
   },

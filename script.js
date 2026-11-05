@@ -1,4 +1,4 @@
-// script.js
+﻿// script.js
 // DEBUG_TRIGGERS = true -> semua area trigger diwarnai merah transparan,
 // supaya gampang cek apakah posisinya sudah pas menutupi tombol/teks di gambar.
 // Set kembali ke false kalau sudah pas.
@@ -344,9 +344,10 @@ function extractYouTubeId(input) {
 // Tujuan   : Menyusun alamat pemutar YouTube lengkap dengan pengaturannya.
 // Parameter: id — ID video; trigger — data trigger (boleh berisi autoplay, mute, loop).
 // Hasilnya : Alamat embed, contoh: https://www.youtube.com/embed/ID?autoplay=1&mute=0&...
-function buildYouTubeUrl(id, trigger) {
+function buildYouTubeUrl(id, trigger, shouldAutoplay = true) {
+  const isAutoplay = shouldAutoplay && trigger.autoplay !== false;
   const params = new URLSearchParams({
-    autoplay: trigger.autoplay === false ? "0" : "1", // 1 = langsung diputar
+    autoplay: isAutoplay ? "1" : "0",                 // 1 = langsung diputar, 0 = menunggu klik
     mute: trigger.mute ? "1" : "0",                   // 1 = mulai tanpa suara
     playsinline: "1",                                 // di iPhone: putar di dalam halaman, bukan layar penuh
     rel: "0",                                         // saran video di akhir hanya dari channel yang sama
@@ -367,6 +368,8 @@ function unmountPageVideos() {
 }
 
 // Tujuan   : Memasang pemutar YouTube untuk setiap trigger bertipe "video" milik satu halaman.
+//            Jika ada lebih dari satu video, HANYA video pertama yang langsung autoplay,
+//            sedangkan video berikutnya dalam mode standby (menunggu klik pembaca).
 // Parameter: page — objek halaman dari PAGES.
 // Dipanggil: Dari renderPage() (jika tidak sedang animasi) dan dari goToPage() setelah animasi selesai.
 // Hasilnya : Elemen .page-video berisi iframe YouTube, diletakkan di atas gambar halaman.
@@ -374,10 +377,16 @@ function mountPageVideos(page) {
   unmountPageVideos(); // pastikan tidak ada video ganda
   if (!page || !page.triggers) return;
 
+  let videoCount = 0; // Menghitung urutan video di halaman ini
+
   page.triggers.forEach((trigger) => {
     if (trigger.type !== "video") return;
     const id = extractYouTubeId(trigger.youtube);
     if (!id) return; // link/ID tidak dikenali → lewati
+
+    // Hanya video pertama yang diizinkan autoplay otomatis
+    const shouldAutoplay = (videoCount === 0);
+    videoCount++;
 
     // Kotak pembungkus: posisi dan ukuran dalam persen, sama seperti trigger lain
     const box = document.createElement("div");
@@ -388,7 +397,7 @@ function mountPageVideos(page) {
     box.style.height = trigger.height + "%";
 
     const frame = document.createElement("iframe");
-    frame.src = buildYouTubeUrl(id, trigger);
+    frame.src = buildYouTubeUrl(id, trigger, shouldAutoplay);
     frame.title = trigger.title || "Video";
     // allow="autoplay": izin agar pemutar YouTube boleh langsung memutar (termasuk dengan suara)
     frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";

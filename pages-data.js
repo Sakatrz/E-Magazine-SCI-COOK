@@ -803,6 +803,7 @@ const PAGES = [
         width: 49.7,
         height: 23.5,
         youtube: "https://youtu.be/prt5w9jwCl0?si=p5Plc-ATQgn5qxhz",
+        mute: true,
       },
       {
         type: "popup",

@@ -434,20 +434,28 @@ const PAGES = [
     ratio: 1202 / 1698, // TODO
     triggers: [
       {
+        type: "popup",
+        left: 42.4,
+        top: 79.1,
+        width: 18.9,
+        height: 9.9,
+        popup: { image: "images/popups/H5-TOMBOL MERAH  BAWAH.png" }
+      },
+      {
         type: "nav-next",
-        left: 85.5,
-        top: 92.9,
-        width: 8,
-        height: 2.4,
+        left: 79,
+        top: 90.5,
+        width: 20.9,
+        height: 7.4
       },
       {
         type: "nav-prev",
-        left: 7.7,
-        top: 93,
-        width: 8.2,
-        height: 2.4,
-      },
-    ],
+        left: 1,
+        top: 91.1,
+        width: 21.7,
+        height: 7
+      }
+    ]
   },
   {
     id: "h6",
@@ -498,18 +506,18 @@ const PAGES = [
     triggers: [
       {
         type: "popup",
-        left: 42.2,
-        top: 26.6,
-        width: 8.8,
-        height: 2.6,
+        left: 49.7,
+        top: 36,
+        width: 8.9,
+        height: 3.4,
         popup: { image: "images/popups/h8-gedeg.png" },
       },
       {
         type: "popup",
-        left: 74.1,
-        top: 26.7,
-        width: 7.9,
-        height: 2.7,
+        left: 81.2,
+        top: 36.1,
+        width: 9.3,
+        height: 3.1,
         popup: { image: "images/popups/H8-Dapor.png" },
       },
       {
@@ -766,6 +774,22 @@ const PAGES = [
     image: "images/h14.png",
     ratio: 1198 / 1684,
     triggers: [
+      {
+        type: "link",
+        left: 44.6,
+        top: 29.3,
+        width: 42.6,
+        height: 23.3,
+        url: "https://m.youtube.com/watch?v=UmTJ_0BNN9M&pp=0gcJCbgCo7VqN5tDiggCQAE%3D",
+      },
+      {
+        type: "link",
+        left: 30.1,
+        top: 65.6,
+        width: 44.6,
+        height: 23.2,
+        url: "https://m.youtube.com/watch?si=2IX7Kh8TriBff4ID&v=oAvODDQ_Cy0&feature=youtu.be",
+      },
       {
         type: "nav-next",
         left: 81.7,

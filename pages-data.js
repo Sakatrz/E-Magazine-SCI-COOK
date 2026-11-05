@@ -776,14 +776,6 @@ const PAGES = [
     triggers: [
       {
         type: "link",
-        left: 44.6,
-        top: 29.3,
-        width: 42.6,
-        height: 23.3,
-        url: "https://m.youtube.com/watch?v=UmTJ_0BNN9M&pp=0gcJCbgCo7VqN5tDiggCQAE%3D",
-      },
-      {
-        type: "link",
         left: 30.1,
         top: 65.6,
         width: 44.6,
@@ -810,7 +802,7 @@ const PAGES = [
         top: 29.5,
         width: 42.8,
         height: 22.8,
-        youtube: "https://youtu.be/HDE-i9nHFQ8?si=iwc5e9KUyvFToCzS"
+        youtube: "https://youtu.be/C_D7ez9XUeI?si=ssPKdnqkfVEysqBr"
       },
     ],
   },

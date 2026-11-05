@@ -805,12 +805,12 @@ const PAGES = [
         youtube: "https://youtu.be/prt5w9jwCl0?si=p5Plc-ATQgn5qxhz",
       },
       {
-        type: "video",
-        left: 21.9,
-        top: 68.5,
-        width: 54.3,
-        height: 21.6,
-        youtube: "https://youtu.be/HDE-i9nHFQ8?si=HZcuRKyrlomIewK6",
+        type: "popup",
+        left: 29.8,
+        top: 69,
+        width: 44.8,
+        height: 20.2,
+        popup: { video: "videos/test.mp4" }
       },
     ],
   },

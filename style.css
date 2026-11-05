@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    E-Magazine SCI-COOK — style.css
    Tema: Elegan, bersih, akademik
    Responsive: Mobile (<640px) | Tablet (640–1024px) | Desktop (>1024px)
@@ -385,6 +385,26 @@ body {
   max-width: 85vw;
   max-height: 75vh;
   border-radius: 4px;
+}
+
+/* Wadah Video di dalam Popup: rasio 16:9 responsif */
+.popup-video-container {
+  position: relative;
+  width: 80vw;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.popup-video-container iframe,
+.popup-video-container video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  object-fit: contain;
 }
 
 /* Tombol silang (×) di pojok kanan atas popup */
@@ -802,10 +822,12 @@ body {
   overflow: hidden;
 }
 
-/* Pemutar YouTube memenuhi seluruh kotak pembungkus */
-.page-video iframe {
+/* Pemutar YouTube atau Video HTML5 lokal memenuhi seluruh kotak pembungkus */
+.page-video iframe,
+.page-video video {
   display: block;
   width: 100%;
   height: 100%;
   border: 0;
+  object-fit: contain; /* menjaga proporsi video tanpa terpotong */
 }

@@ -1,331 +1,380 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<!-- Judul tab browser untuk alat bantu ini -->
-<title>Trigger Position Picker</title>
-<style>
-  /* Reset: semua elemen menghitung ukuran termasuk padding & border */
-  * { box-sizing: border-box; }
-  /* Tata letak dua kolom: panel kiri (gambar) dan panel kanan (kontrol) */
-  body {
-    margin: 0;
-    font-family: system-ui, Arial, sans-serif;
-    display: flex;
-    height: 100vh;
-  }
-  /* Panel kiri: area gelap tempat gambar halaman ditampilkan, bisa di-scroll jika gambar besar */
-  #left-panel {
-    flex: 1;
-    overflow: auto;
-    background: #222;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px;
-  }
-  /* Pembungkus gambar dan canvas (papan gambar) yang bertumpuk */
-  #canvas-wrap {
-    position: relative;
-    line-height: 0;
-  }
-  /* Gambar halaman majalah yang ditampilkan sebagai acuan menggambar area trigger */
-  #canvas-wrap img {
-    max-width: 90vw;
-    display: block;
-  }
-  /* Canvas transparan di atas gambar: tempat kotak merah trigger digambar */
-  #overlay {
-    position: absolute;
-    top: 0; left: 0;
-    cursor: crosshair; /* kursor berubah menjadi salib saat berada di atas canvas */
-  }
-  /* Panel kanan: formulir pengaturan trigger dan area hasil kode */
-  #right-panel {
-    width: 380px;
-    flex-shrink: 0;
-    background: #f5f5f5;
-    padding: 16px;
-    overflow: auto;
-    border-left: 1px solid #ccc;
-  }
-  h2 { font-size: 1rem; margin-top: 0; }
-  #file-input { margin-bottom: 12px; width: 100%; }
-  /* Kartu satu trigger di daftar: berisi tipe, koordinat, dan tombol hapus */
-  .trig-item {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px;
-    margin-bottom: 8px;
-    font-size: 0.82rem;
-  }
-  .trig-item label { display: block; margin-top: 4px; font-weight: 600; }
-  .trig-item select, .trig-item input, .trig-item textarea {
-    width: 100%;
-    font-size: 0.8rem;
-    padding: 3px 4px;
-    margin-top: 2px;
-  }
-  /* Teks koordinat kecil di bawah setiap kartu trigger */
-  .trig-item .coords { color: #555; font-size: 0.75rem; margin-top: 4px; }
-  /* Tombol hapus trigger: warna merah */
-  .trig-item button.remove {
-    margin-top: 6px;
-    background: #c0392b;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 0.75rem;
-  }
-  /* Area teks baca-saja yang menampilkan hasil kode trigger siap tempel */
-  #output {
-    width: 100%;
-    height: 220px;
-    font-family: monospace;
-    font-size: 0.72rem;
-    margin-top: 10px;
-  }
-  /* Tombol salin hasil ke clipboard */
-  #copy-btn {
-    margin-top: 6px;
-    width: 100%;
-    padding: 8px;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  /* Kotak petunjuk kuning atau biru */
-  .hint {
-    font-size: 0.78rem;
-    color: #555;
-    background: #fff9db;
-    border: 1px solid #f1e0a0;
-    padding: 8px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <!-- Judul tab browser untuk alat bantu ini -->
+  <title>Trigger Position Picker</title>
+  <style>
+    /* Reset: semua elemen menghitung ukuran termasuk padding & border */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Tata letak dua kolom: panel kiri (gambar) dan panel kanan (kontrol) */
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Panel kiri: area gelap tempat gambar halaman ditampilkan, bisa di-scroll jika gambar besar */
+    #left-panel {
+      flex: 1;
+      overflow: auto;
+      background: #222;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Pembungkus gambar dan canvas (papan gambar) yang bertumpuk */
+    #canvas-wrap {
+      position: relative;
+      line-height: 0;
+    }
+
+    /* Gambar halaman majalah yang ditampilkan sebagai acuan menggambar area trigger */
+    #canvas-wrap img {
+      max-width: 90vw;
+      display: block;
+    }
+
+    /* Canvas transparan di atas gambar: tempat kotak merah trigger digambar */
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: crosshair;
+      /* kursor berubah menjadi salib saat berada di atas canvas */
+    }
+
+    /* Panel kanan: formulir pengaturan trigger dan area hasil kode */
+    #right-panel {
+      width: 380px;
+      flex-shrink: 0;
+      background: #f5f5f5;
+      padding: 16px;
+      overflow: auto;
+      border-left: 1px solid #ccc;
+    }
+
+    h2 {
+      font-size: 1rem;
+      margin-top: 0;
+    }
+
+    #file-input {
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    /* Kartu satu trigger di daftar: berisi tipe, koordinat, dan tombol hapus */
+    .trig-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+    }
+
+    .trig-item label {
+      display: block;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .trig-item select,
+    .trig-item input,
+    .trig-item textarea {
+      width: 100%;
+      font-size: 0.8rem;
+      padding: 3px 4px;
+      margin-top: 2px;
+    }
+
+    /* Teks koordinat kecil di bawah setiap kartu trigger */
+    .trig-item .coords {
+      color: #555;
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    /* Tombol hapus trigger: warna merah */
+    .trig-item button.remove {
+      margin-top: 6px;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    /* Area teks baca-saja yang menampilkan hasil kode trigger siap tempel */
+    #output {
+      width: 100%;
+      height: 220px;
+      font-family: monospace;
+      font-size: 0.72rem;
+      margin-top: 10px;
+    }
+
+    /* Tombol salin hasil ke clipboard */
+    #copy-btn {
+      margin-top: 6px;
+      width: 100%;
+      padding: 8px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Kotak petunjuk kuning atau biru */
+    .hint {
+      font-size: 0.78rem;
+      color: #555;
+      background: #fff9db;
+      border: 1px solid #f1e0a0;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ===== Panel Kiri: Area Gambar ===== -->
-<!-- Tempat menampilkan gambar halaman majalah dan menggambar kotak area trigger di atasnya -->
-<div id="left-panel">
-  <div id="canvas-wrap">
-    <!-- Gambar halaman yang dimuat dari file lokal; sumber diisi oleh JavaScript -->
-    <img id="page-img" alt="preview">
-    <!-- Canvas transparan di atas gambar: dipakai untuk menggambar kotak area trigger secara interaktif -->
-    <canvas id="overlay"></canvas>
-  </div>
-</div>
-
-<!-- ===== Panel Kanan: Kontrol & Hasil ===== -->
-<div id="right-panel">
-  <h2>1. Buka gambar halaman</h2>
-  <!-- Tombol pilih file: pengguna memilih file PNG/JPEG gambar halaman majalah dari komputer -->
-  <input type="file" id="file-input" accept="image/png,image/jpeg">
-
-  <!-- Petunjuk cara menggambar area trigger -->
-  <div class="hint">
-    Klik lalu drag di atas gambar untuk menggambar kotak area trigger
-    (tombol navigasi / teks yang bisa diklik). Bisa gambar berkali-kali
-    untuk beberapa trigger dalam 1 halaman.
-    <br><br>
-    <strong>Teks yang kepotong ganti baris</strong> (misal "termometer" di baris
-    atas, "digital" di baris bawah): gambar 2 kotak terpisah (satu per
-    potongan baris), lalu di kotak kedua pilih "Sama seperti trigger #..."
-    supaya isi popupnya otomatis kembar tanpa isi ulang manual.
+  <!-- ===== Panel Kiri: Area Gambar ===== -->
+  <!-- Tempat menampilkan gambar halaman majalah dan menggambar kotak area trigger di atasnya -->
+  <div id="left-panel">
+    <div id="canvas-wrap">
+      <!-- Gambar halaman yang dimuat dari file lokal; sumber diisi oleh JavaScript -->
+      <img id="page-img" alt="preview">
+      <!-- Canvas transparan di atas gambar: dipakai untuk menggambar kotak area trigger secara interaktif -->
+      <canvas id="overlay"></canvas>
+    </div>
   </div>
 
-  <!-- Petunjuk cara menggunakan mode popup bergambar -->
-  <div class="hint" style="background:#e8f4ff; border-color:#a9d3f5;">
-    Untuk mode "Gambar": klik "Choose File" lalu pilih file PNG popup-nya
-    (yang sudah kamu export dari Figma). Path-nya otomatis dibuat sebagai
-    <code>images/popups/nama-file.png</code> — <strong>pastikan file itu
-    memang sudah kamu taruh di folder <code>images/popups/</code></strong>
-    sebelum ditest di browser (di sini cuma untuk ambil nama filenya &
-    preview, bukan meng-copy filenya).
+  <!-- ===== Panel Kanan: Kontrol & Hasil ===== -->
+  <div id="right-panel">
+    <h2>1. Buka gambar halaman</h2>
+    <!-- Tombol pilih file: pengguna memilih file PNG/JPEG gambar halaman majalah dari komputer -->
+    <input type="file" id="file-input" accept="image/png,image/jpeg">
+
+    <!-- Petunjuk cara menggambar area trigger -->
+    <div class="hint">
+      Klik lalu drag di atas gambar untuk menggambar kotak area trigger
+      (tombol navigasi / teks yang bisa diklik). Bisa gambar berkali-kali
+      untuk beberapa trigger dalam 1 halaman.
+      <br><br>
+      <strong>Teks yang kepotong ganti baris</strong> (misal "termometer" di baris
+      atas, "digital" di baris bawah): gambar 2 kotak terpisah (satu per
+      potongan baris), lalu di kotak kedua pilih "Sama seperti trigger #..."
+      supaya isi popupnya otomatis kembar tanpa isi ulang manual.
+    </div>
+
+    <!-- Petunjuk cara menggunakan mode popup bergambar -->
+    <div class="hint" style="background:#e8f4ff; border-color:#a9d3f5;">
+      Untuk mode "Gambar": klik "Choose File" lalu pilih file PNG popup-nya
+      (yang sudah kamu export dari Figma). Path-nya otomatis dibuat sebagai
+      <code>images/popups/nama-file.png</code> — <strong>pastikan file itu
+        memang sudah kamu taruh di folder <code>images/popups/</code></strong>
+      sebelum ditest di browser (di sini cuma untuk ambil nama filenya &
+      preview, bukan meng-copy filenya).
+    </div>
+
+    <!-- Petunjuk cara menggunakan mode video -->
+    <div class="hint" style="background:#f3e8ff; border-color:#d8b4fe;">
+      <strong>Mode Video:</strong>
+      <br>
+      • <strong>YouTube:</strong> Tempel link/ID YouTube. Ringan & tidak membebani repositori.
+      <br>
+      • <strong>File MP4 Lokal:</strong> Ketik nama file (misal <code>h14.mp4</code>) atau klik pilih file. Path
+      otomatis jadi <code>videos/nama-file.mp4</code>. <strong>Pastikan file sudah ditaruh di folder
+        <code>videos/</code></strong> dan ukurannya sudah dikompres (di bawah 15-20 MB).
+    </div>
+
+    <h2>2. Daftar trigger</h2>
+    <!-- Daftar kartu trigger yang sudah digambar; diisi otomatis oleh JavaScript -->
+    <div id="trig-list"></div>
+
+    <h2>3. Hasil (copy ke pages-data.js)</h2>
+    <!-- Area teks baca-saja yang menampilkan kode trigger siap tempel ke pages-data.js -->
+    <textarea id="output" readonly></textarea>
+    <button id="copy-btn">Copy ke Clipboard</button>
   </div>
 
-  <h2>2. Daftar trigger</h2>
-  <!-- Daftar kartu trigger yang sudah digambar; diisi otomatis oleh JavaScript -->
-  <div id="trig-list"></div>
+  <script>
+    // ===== Referensi Elemen HTML =====
+    // Mengambil semua elemen yang dibutuhkan JavaScript
+    const fileInput = document.getElementById("file-input");
+    const img = document.getElementById("page-img");
+    const overlay = document.getElementById("overlay");
+    // ctx: "pensil" virtual untuk menggambar kotak di atas canvas
+    const ctx = overlay.getContext("2d");
+    const trigList = document.getElementById("trig-list");
+    const output = document.getElementById("output");
+    const copyBtn = document.getElementById("copy-btn");
 
-  <h2>3. Hasil (copy ke pages-data.js)</h2>
-  <!-- Area teks baca-saja yang menampilkan kode trigger siap tempel ke pages-data.js -->
-  <textarea id="output" readonly></textarea>
-  <button id="copy-btn">Copy ke Clipboard</button>
-</div>
+    // ===== Variabel Status =====
+    // Daftar semua area trigger yang sudah digambar: {type, left, top, width, height, image, imagePreviewUrl}
+    let triggers = []; // {type, left, top, width, height, title, body}
+    // Ukuran asli (piksel) gambar yang dimuat — dipakai untuk konversi ke persen
+    let naturalW = 0, naturalH = 0;
+    // Penanda apakah pengguna sedang menekan tombol mouse dan menggambar kotak
+    let drawing = false;
+    // Koordinat awal dan posisi mouse saat ini (dalam piksel canvas)
+    let startX = 0, startY = 0, curX = 0, curY = 0;
 
-<script>
-// ===== Referensi Elemen HTML =====
-// Mengambil semua elemen yang dibutuhkan JavaScript
-const fileInput = document.getElementById("file-input");
-const img = document.getElementById("page-img");
-const overlay = document.getElementById("overlay");
-// ctx: "pensil" virtual untuk menggambar kotak di atas canvas
-const ctx = overlay.getContext("2d");
-const trigList = document.getElementById("trig-list");
-const output = document.getElementById("output");
-const copyBtn = document.getElementById("copy-btn");
+    // ===== Pendengar: Memuat File Gambar =====
+    // Saat pengguna memilih file gambar: tampilkan di panel kiri, atur ulang canvas dan daftar trigger
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      // Buat URL sementara untuk menampilkan file lokal tanpa mengunggahnya ke server
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      img.onload = () => {
+        naturalW = img.naturalWidth;
+        naturalH = img.naturalHeight;
+        resizeOverlay();
+        // Reset daftar trigger setiap kali gambar baru dimuat
+        triggers = [];
+        renderList();
+      };
+    });
 
-// ===== Variabel Status =====
-// Daftar semua area trigger yang sudah digambar: {type, left, top, width, height, image, imagePreviewUrl}
-let triggers = []; // {type, left, top, width, height, title, body}
-// Ukuran asli (piksel) gambar yang dimuat — dipakai untuk konversi ke persen
-let naturalW = 0, naturalH = 0;
-// Penanda apakah pengguna sedang menekan tombol mouse dan menggambar kotak
-let drawing = false;
-// Koordinat awal dan posisi mouse saat ini (dalam piksel canvas)
-let startX = 0, startY = 0, curX = 0, curY = 0;
+    // ===== Fungsi: Sinkronkan Ukuran Canvas dengan Gambar =====
+    // Tujuan   : Membuat canvas selalu sama besar dengan gambar yang tampil di layar.
+    //            Perlu dipanggil ulang setiap kali jendela browser diubah ukurannya.
+    // Hasilnya : Canvas menimpa gambar dengan tepat, lalu gambar ulang kotak trigger.
+    function resizeOverlay() {
+      const rect = img.getBoundingClientRect();
+      overlay.style.width = rect.width + "px";
+      overlay.style.height = rect.height + "px";
+      overlay.width = rect.width;
+      overlay.height = rect.height;
+      overlay.style.position = "absolute";
+      overlay.style.left = "0";
+      overlay.style.top = "0";
+      redraw();
+    }
+    // Perbarui canvas setiap kali ukuran jendela berubah (mis. saat orientasi HP berputar)
+    window.addEventListener("resize", resizeOverlay);
 
-// ===== Pendengar: Memuat File Gambar =====
-// Saat pengguna memilih file gambar: tampilkan di panel kiri, atur ulang canvas dan daftar trigger
-fileInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  // Buat URL sementara untuk menampilkan file lokal tanpa mengunggahnya ke server
-  const url = URL.createObjectURL(file);
-  img.src = url;
-  img.onload = () => {
-    naturalW = img.naturalWidth;
-    naturalH = img.naturalHeight;
-    resizeOverlay();
-    // Reset daftar trigger setiap kali gambar baru dimuat
-    triggers = [];
-    renderList();
-  };
-});
+    // ===== Pendengar: Menggambar Kotak Area Trigger =====
+    // Saat tombol mouse ditekan di canvas: catat posisi awal gambar
+    overlay.addEventListener("mousedown", (e) => {
+      drawing = true;
+      const r = overlay.getBoundingClientRect();
+      startX = e.clientX - r.left;
+      startY = e.clientY - r.top;
+      curX = startX; curY = startY;
+    });
+    // Saat mouse bergerak sambil ditekan: perbarui posisi ujung kotak dan gambar ulang
+    overlay.addEventListener("mousemove", (e) => {
+      if (!drawing) return;
+      const r = overlay.getBoundingClientRect();
+      curX = e.clientX - r.left;
+      curY = e.clientY - r.top;
+      redraw();
+    });
+    // Saat tombol mouse dilepas: hitung koordinat persen lalu simpan trigger baru
+    window.addEventListener("mouseup", () => {
+      if (!drawing) return;
+      drawing = false;
+      const w = Math.abs(curX - startX);
+      const h = Math.abs(curY - startY);
+      if (w < 4 || h < 4) { redraw(); return; } // terlalu kecil, abaikan
 
-// ===== Fungsi: Sinkronkan Ukuran Canvas dengan Gambar =====
-// Tujuan   : Membuat canvas selalu sama besar dengan gambar yang tampil di layar.
-//            Perlu dipanggil ulang setiap kali jendela browser diubah ukurannya.
-// Hasilnya : Canvas menimpa gambar dengan tepat, lalu gambar ulang kotak trigger.
-function resizeOverlay() {
-  const rect = img.getBoundingClientRect();
-  overlay.style.width = rect.width + "px";
-  overlay.style.height = rect.height + "px";
-  overlay.width = rect.width;
-  overlay.height = rect.height;
-  overlay.style.position = "absolute";
-  overlay.style.left = "0";
-  overlay.style.top = "0";
-  redraw();
-}
-// Perbarui canvas setiap kali ukuran jendela berubah (mis. saat orientasi HP berputar)
-window.addEventListener("resize", resizeOverlay);
+      // dispW/dispH: ukuran canvas yang tampil di layar (bisa berbeda dari ukuran asli gambar)
+      const dispW = overlay.width, dispH = overlay.height;
+      // Konversi koordinat piksel ke persen agar posisi akurat di semua ukuran layar
+      const left = Math.min(startX, curX) / dispW * 100;
+      const top = Math.min(startY, curY) / dispH * 100;
+      const width = w / dispW * 100;
+      const height = h / dispH * 100;
 
-// ===== Pendengar: Menggambar Kotak Area Trigger =====
-// Saat tombol mouse ditekan di canvas: catat posisi awal gambar
-overlay.addEventListener("mousedown", (e) => {
-  drawing = true;
-  const r = overlay.getBoundingClientRect();
-  startX = e.clientX - r.left;
-  startY = e.clientY - r.top;
-  curX = startX; curY = startY;
-});
-// Saat mouse bergerak sambil ditekan: perbarui posisi ujung kotak dan gambar ulang
-overlay.addEventListener("mousemove", (e) => {
-  if (!drawing) return;
-  const r = overlay.getBoundingClientRect();
-  curX = e.clientX - r.left;
-  curY = e.clientY - r.top;
-  redraw();
-});
-// Saat tombol mouse dilepas: hitung koordinat persen lalu simpan trigger baru
-window.addEventListener("mouseup", () => {
-  if (!drawing) return;
-  drawing = false;
-  const w = Math.abs(curX - startX);
-  const h = Math.abs(curY - startY);
-  if (w < 4 || h < 4) { redraw(); return; } // terlalu kecil, abaikan
+      // Simpan trigger baru dengan nilai default tipe "nav-next" (bisa diubah di panel kanan)
+      triggers.push({
+        type: "nav-next",
+        left: +left.toFixed(1),
+        top: +top.toFixed(1),
+        width: +width.toFixed(1),
+        height: +height.toFixed(1),
+        image: "",
+        imagePreviewUrl: ""
+      });
+      renderList();
+      redraw();
+    });
 
-  // dispW/dispH: ukuran canvas yang tampil di layar (bisa berbeda dari ukuran asli gambar)
-  const dispW = overlay.width, dispH = overlay.height;
-  // Konversi koordinat piksel ke persen agar posisi akurat di semua ukuran layar
-  const left = Math.min(startX, curX) / dispW * 100;
-  const top = Math.min(startY, curY) / dispH * 100;
-  const width = w / dispW * 100;
-  const height = h / dispH * 100;
+    // ===== Fungsi: Gambar Ulang Canvas =====
+    // Tujuan   : Menghapus canvas lalu menggambar ulang semua kotak trigger (merah)
+    //            dan kotak yang sedang digambar (biru) berdasarkan data terbaru.
+    // Dipanggil: Setiap kali trigger berubah atau mouse bergerak saat menggambar.
+    function redraw() {
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
+      // Warna merah untuk kotak trigger yang sudah tersimpan
+      ctx.strokeStyle = "red";
+      ctx.fillStyle = "rgba(255,0,0,0.25)";
+      ctx.lineWidth = 2;
 
-  // Simpan trigger baru dengan nilai default tipe "nav-next" (bisa diubah di panel kanan)
-  triggers.push({
-    type: "nav-next",
-    left: +left.toFixed(1),
-    top: +top.toFixed(1),
-    width: +width.toFixed(1),
-    height: +height.toFixed(1),
-    image: "",
-    imagePreviewUrl: ""
-  });
-  renderList();
-  redraw();
-});
+      // Gambar semua trigger yang sudah ada (konversi dari persen ke piksel canvas)
+      triggers.forEach((t) => {
+        const x = t.left / 100 * overlay.width;
+        const y = t.top / 100 * overlay.height;
+        const w = t.width / 100 * overlay.width;
+        const h = t.height / 100 * overlay.height;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeRect(x, y, w, h);
+      });
 
-// ===== Fungsi: Gambar Ulang Canvas =====
-// Tujuan   : Menghapus canvas lalu menggambar ulang semua kotak trigger (merah)
-//            dan kotak yang sedang digambar (biru) berdasarkan data terbaru.
-// Dipanggil: Setiap kali trigger berubah atau mouse bergerak saat menggambar.
-function redraw() {
-  ctx.clearRect(0, 0, overlay.width, overlay.height);
-  // Warna merah untuk kotak trigger yang sudah tersimpan
-  ctx.strokeStyle = "red";
-  ctx.fillStyle = "rgba(255,0,0,0.25)";
-  ctx.lineWidth = 2;
+      // Gambar kotak biru yang sedang dalam proses digambar (saat mouse masih ditekan)
+      if (drawing) {
+        const x = Math.min(startX, curX);
+        const y = Math.min(startY, curY);
+        const w = Math.abs(curX - startX);
+        const h = Math.abs(curY - startY);
+        ctx.strokeStyle = "#2563eb";
+        ctx.strokeRect(x, y, w, h);
+      }
+    }
 
-  // Gambar semua trigger yang sudah ada (konversi dari persen ke piksel canvas)
-  triggers.forEach((t) => {
-    const x = t.left / 100 * overlay.width;
-    const y = t.top / 100 * overlay.height;
-    const w = t.width / 100 * overlay.width;
-    const h = t.height / 100 * overlay.height;
-    ctx.fillRect(x, y, w, h);
-    ctx.strokeRect(x, y, w, h);
-  });
+    // ===== Fungsi: Render Daftar Trigger di Panel Kanan =====
+    // Tujuan   : Membuat ulang seluruh daftar kartu trigger di panel kanan.
+    //            Setiap trigger ditampilkan sebagai kartu berisi dropdown tipe,
+    //            input tambahan (sesuai tipe), koordinat, dan tombol hapus.
+    // Dipanggil: Setiap kali trigger ditambah, dihapus, atau diubah.
+    //
+    // Catatan: Bagian innerHTML di dalam fungsi ini menggunakan template string (backtick);
+    //          komentar tidak disisipkan di dalamnya sesuai aturan — penjelasan ada di sini.
+    function renderList() {
+      trigList.innerHTML = "";
+      triggers.forEach((t, i) => {
+        // Cari trigger lain yang bertipe popup (untuk fitur "salin dari trigger lain")
+        const otherPopupIndexes = triggers
+          .map((tt, ii) => ({ tt, ii }))
+          .filter(({ tt, ii }) => tt.type === "popup" && ii !== i);
 
-  // Gambar kotak biru yang sedang dalam proses digambar (saat mouse masih ditekan)
-  if (drawing) {
-    const x = Math.min(startX, curX);
-    const y = Math.min(startY, curY);
-    const w = Math.abs(curX - startX);
-    const h = Math.abs(curY - startY);
-    ctx.strokeStyle = "#2563eb";
-    ctx.strokeRect(x, y, w, h);
-  }
-}
-
-// ===== Fungsi: Render Daftar Trigger di Panel Kanan =====
-// Tujuan   : Membuat ulang seluruh daftar kartu trigger di panel kanan.
-//            Setiap trigger ditampilkan sebagai kartu berisi dropdown tipe,
-//            input tambahan (sesuai tipe), koordinat, dan tombol hapus.
-// Dipanggil: Setiap kali trigger ditambah, dihapus, atau diubah.
-//
-// Catatan: Bagian innerHTML di dalam fungsi ini menggunakan template string (backtick);
-//          komentar tidak disisipkan di dalamnya sesuai aturan — penjelasan ada di sini.
-function renderList() {
-  trigList.innerHTML = "";
-  triggers.forEach((t, i) => {
-    // Cari trigger lain yang bertipe popup (untuk fitur "salin dari trigger lain")
-    const otherPopupIndexes = triggers
-      .map((tt, ii) => ({ tt, ii }))
-      .filter(({ tt, ii }) => tt.type === "popup" && ii !== i);
-
-    const div = document.createElement("div");
-    div.className = "trig-item";
-    div.innerHTML = `
+        const div = document.createElement("div");
+        div.className = "trig-item";
+        div.innerHTML = `
       <label>Tipe</label>
       <select data-i="${i}" data-field="type">
         <option value="nav-next" ${t.type === "nav-next" ? "selected" : ""}>nav-next (panah kanan)</option>
         <option value="nav-prev" ${t.type === "nav-prev" ? "selected" : ""}>nav-prev (panah kiri)</option>
         <option value="nav-page" ${t.type === "nav-page" ? "selected" : ""}>nav-page (daftar isi / lompat halaman)</option>
         <option value="link" ${t.type === "link" ? "selected" : ""}>link (buka URL web eksternal)</option>
-        <option value="popup" ${t.type === "popup" ? "selected" : ""}>popup (teks diklik)</option>
-        <option value="video" ${t.type === "video" ? "selected" : ""}>video (YouTube, otomatis diputar)</option>
+        <option value="popup" ${t.type === "popup" ? "selected" : ""}>popup</option>
+        <option value="video" ${t.type === "video" ? "selected" : ""}>video</option>
       </select>
 
       ${t.type === "nav-page" ? `
@@ -339,100 +388,155 @@ function renderList() {
       ` : ""}
 
       ${t.type === "video" ? `
-        <label>Link YouTube (atau ID video)</label>
-        <input type="text" data-i="${i}" data-field="youtube" value="${t.youtube || ''}" placeholder="https://youtu.be/xxxxxxxxxxx">
+        <label>Sumber Video</label>
+        <select data-i="${i}" data-field="videoSource">
+          <option value="youtube" ${(!t.videoSource || t.videoSource === "youtube") ? "selected" : ""}>youtube</option>
+          <option value="local" ${t.videoSource === "local" ? "selected" : ""}>file mp4 lokal</option>
+        </select>
+
+        ${t.videoSource === "local" ? `
+          <label>Nama File Video (folder videos/)</label>
+          <input type="text" data-i="${i}" data-field="videoFileName" value="${(t.src ? t.src.replace(/^videos\//, '') : '')}" placeholder="contoh: h14.mp4">
+          <input type="file" data-i="${i}" data-field="videoFile" accept="video/mp4,video/webm" style="margin-top:4px;">
+          <div style="font-size:0.72rem;color:#555;margin-top:3px;">
+            Path: <code>${t.src || "videos/..."}</code>
+          </div>
+        ` : `
+          <label>Link YouTube</label>
+          <input type="text" data-i="${i}" data-field="youtube" value="${t.youtube || ''}" placeholder="https://youtu.be/xxxxxxxxxxx">
+        `}
+
         <label style="font-weight:400;"><input type="checkbox" data-i="${i}" data-field="mute" ${t.mute ? "checked" : ""} style="width:auto;"> Mulai tanpa suara (pasti autoplay di semua HP)</label>
         <label style="font-weight:400;"><input type="checkbox" data-i="${i}" data-field="loop" ${t.loop ? "checked" : ""} style="width:auto;"> Ulangi terus (loop)</label>
       ` : ""}
 
       ${t.type === "popup" ? `
-        ${otherPopupIndexes.length > 0 ? `
-          <label>Teks ini lanjutan/kembar dari trigger popup lain? (buat teks yang kepotong ganti baris)</label>
-          <select data-i="${i}" data-field="copyFrom">
-            <option value="">— (isi manual) —</option>
-            ${otherPopupIndexes.map(({ ii }) => `<option value="${ii}">Sama seperti trigger #${ii + 1}</option>`).join("")}
-          </select>
-        ` : ""}
-        <label>Pilih file gambar popup (folder images/popups/)</label>
-        <input type="file" data-i="${i}" data-field="imageFile" accept="image/png,image/jpeg">
-        <div style="font-size:0.72rem;color:#555;margin-top:3px;">
-          Path: <code>${t.image || "(belum pilih file)"}</code>
-        </div>
-        ${t.imagePreviewUrl ? `<img src="${t.imagePreviewUrl}" style="max-width:100%;margin-top:5px;border:1px solid #ccc;border-radius:4px;">` : ""}
+        <label>Isi Popup</label>
+        <select data-i="${i}" data-field="popupKind">
+          <option value="image" ${(!t.popupKind || t.popupKind === "image") ? "selected" : ""}>gambar (export Figma)</option>
+          <option value="video" ${t.popupKind === "video" ? "selected" : ""}>video (YouTube / Lokal)</option>
+        </select>
+
+        ${t.popupKind === "video" ? `
+          <label>Video Popup (Link YouTube atau path video)</label>
+          <input type="text" data-i="${i}" data-field="popupVideo" value="${t.popupVideo || ''}" placeholder="https://youtu.be/... atau videos/h14.mp4">
+        ` : `
+          ${otherPopupIndexes.length > 0 ? `
+            <label>Teks ini lanjutan/kembar dari trigger popup lain? (buat teks yang kepotong ganti baris)</label>
+            <select data-i="${i}" data-field="copyFrom">
+              <option value="">— (isi manual) —</option>
+              ${otherPopupIndexes.map(({ ii }) => `<option value="${ii}">Sama seperti trigger #${ii + 1}</option>`).join("")}
+            </select>
+          ` : ""}
+          <label>Pilih file gambar popup (folder images/popups/)</label>
+          <input type="file" data-i="${i}" data-field="imageFile" accept="image/png,image/jpeg">
+          <div style="font-size:0.72rem;color:#555;margin-top:3px;">
+            Path: <code>${t.image || "(belum pilih file)"}</code>
+          </div>
+          ${t.imagePreviewUrl ? `<img src="${t.imagePreviewUrl}" style="max-width:100%;margin-top:5px;border:1px solid #ccc;border-radius:4px;">` : ""}
+        `}
       ` : ""}
       <div class="coords">left:${t.left}% top:${t.top}% width:${t.width}% height:${t.height}%</div>
       <button class="remove" data-i="${i}">Hapus</button>
     `;
-    trigList.appendChild(div);
-  });
+        trigList.appendChild(div);
+      });
 
-  // ── Pendengar aksi untuk input file gambar popup ──
-  // Saat file gambar popup dipilih: simpan nama file dan buat URL preview-nya
-  trigList.querySelectorAll('input[type="file"][data-field="imageFile"]').forEach((el) => {
-    el.addEventListener("change", (e) => {
-      const i = +e.target.dataset.i;
-      const file = e.target.files[0];
-      if (!file) return;
-      // Asumsi konvensi project: semua gambar popup ada di folder images/popups/
-      triggers[i].image = "images/popups/" + file.name;
-      triggers[i].imagePreviewUrl = URL.createObjectURL(file);
-      renderList();
-    });
-  });
-
-  // ── Pendengar aksi untuk semua input, select, dan textarea lainnya ──
-  // Memperbarui data trigger saat pengguna mengubah nilai di formulir
-  trigList.querySelectorAll("select, input, textarea").forEach((el) => {
-    if (el.type === "file") return; // sudah ditangani listener khusus di atas
-    el.addEventListener("input", (e) => {
-      const i = +e.target.dataset.i;
-      const field = e.target.dataset.field;
-
-      if (field === "copyFrom") {
-        // Fitur salin popup dari trigger lain (untuk teks yang terpotong ganti baris)
-        if (e.target.value !== "") {
-          const src = triggers[+e.target.value];
-          triggers[i].image = src.image;
-          triggers[i].imagePreviewUrl = src.imagePreviewUrl;
+      // ── Pendengar aksi untuk input file video lokal ──
+      trigList.querySelectorAll('input[type="file"][data-field="videoFile"]').forEach((el) => {
+        el.addEventListener("change", (e) => {
+          const i = +e.target.dataset.i;
+          const file = e.target.files[0];
+          if (!file) return;
+          triggers[i].src = "videos/" + file.name;
           renderList();
-        }
-        return;
-      }
+        });
+      });
 
-      // Kotak centang (mute/loop) menyimpan true/false; input lain menyimpan teksnya
-      triggers[i][field] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-      if (field === "type") {
-        // Set default nilai jika field berganti
-        if (e.target.value === "nav-page" && !triggers[i].page) triggers[i].page = 1;
-        if (e.target.value === "link" && !triggers[i].url) triggers[i].url = "https://";
-        renderList();
-        return;
-      }
+      // ── Pendengar aksi untuk input file gambar popup ──
+      // Saat file gambar popup dipilih: simpan nama file dan buat URL preview-nya
+      trigList.querySelectorAll('input[type="file"][data-field="imageFile"]').forEach((el) => {
+        el.addEventListener("change", (e) => {
+          const i = +e.target.dataset.i;
+          const file = e.target.files[0];
+          if (!file) return;
+          // Asumsi konvensi project: semua gambar popup ada di folder images/popups/
+          triggers[i].image = "images/popups/" + file.name;
+          triggers[i].imagePreviewUrl = URL.createObjectURL(file);
+          renderList();
+        });
+      });
+
+      // ── Pendengar aksi untuk semua input, select, dan textarea lainnya ──
+      // Memperbarui data trigger saat pengguna mengubah nilai di formulir
+      trigList.querySelectorAll("select, input, textarea").forEach((el) => {
+        if (el.type === "file") return; // sudah ditangani listener khusus di atas
+        el.addEventListener("input", (e) => {
+          const i = +e.target.dataset.i;
+          const field = e.target.dataset.field;
+
+          if (field === "copyFrom") {
+            // Fitur salin popup dari trigger lain (untuk teks yang terpotong ganti baris)
+            if (e.target.value !== "") {
+              const src = triggers[+e.target.value];
+              triggers[i].image = src.image;
+              triggers[i].imagePreviewUrl = src.imagePreviewUrl;
+              renderList();
+            }
+            return;
+          }
+
+          if (field === "videoFileName") {
+            const val = e.target.value.trim().replace(/^videos\//, '');
+            triggers[i].src = val ? ("videos/" + val) : "";
+            renderOutput();
+            return;
+          }
+
+          // Kotak centang (mute/loop) menyimpan true/false; input lain menyimpan teksnya
+          triggers[i][field] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+          if (field === "type" || field === "videoSource" || field === "popupKind") {
+            // Set default nilai jika field berganti
+            if (e.target.value === "nav-page" && !triggers[i].page) triggers[i].page = 1;
+            if (e.target.value === "link" && !triggers[i].url) triggers[i].url = "https://";
+            renderList();
+            return;
+          }
+          renderOutput();
+        });
+      });
+      // ── Pendengar aksi untuk tombol hapus ──
+      trigList.querySelectorAll("button.remove").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const i = +e.target.dataset.i;
+          // Hapus trigger dari array dan perbarui tampilan
+          triggers.splice(i, 1);
+          renderList();
+          redraw();
+        });
+      });
+
       renderOutput();
-    });
-  });
-  // ── Pendengar aksi untuk tombol hapus ──
-  trigList.querySelectorAll("button.remove").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const i = +e.target.dataset.i;
-      // Hapus trigger dari array dan perbarui tampilan
-      triggers.splice(i, 1);
-      renderList();
-      redraw();
-    });
-  });
+    }
 
-  renderOutput();
-}
-
-// ===== Fungsi: Hasilkan Kode Trigger =====
-// Tujuan   : Mengubah semua data trigger menjadi kode JavaScript siap tempel ke pages-data.js.
-// Dipanggil: Setiap kali trigger berubah (dari renderList).
-// Hasilnya : Teks di kotak "output" diperbarui.
-function renderOutput() {
-  const lines = triggers.map((t) => {
-    if (t.type === "popup") {
-      return `      {
+    // ===== Fungsi: Hasilkan Kode Trigger =====
+    // Tujuan   : Mengubah semua data trigger menjadi kode JavaScript siap tempel ke pages-data.js.
+    // Dipanggil: Setiap kali trigger berubah (dari renderList).
+    // Hasilnya : Teks di kotak "output" diperbarui.
+    function renderOutput() {
+      const lines = triggers.map((t) => {
+        if (t.type === "popup") {
+          if (t.popupKind === "video" || t.popupVideo) {
+            return `      {
+        type: "popup",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        popup: { video: "${(t.popupVideo || "").replace(/"/g, '\\"')}" }
+      }`;
+          }
+          return `      {
         type: "popup",
         left: ${t.left},
         top: ${t.top},
@@ -440,9 +544,9 @@ function renderOutput() {
         height: ${t.height},
         popup: { image: "${(t.image || "").replace(/"/g, '\\"')}" }
       }`;
-    }
-    if (t.type === "nav-page") {
-      return `      {
+        }
+        if (t.type === "nav-page") {
+          return `      {
         type: "nav-page",
         left: ${t.left},
         top: ${t.top},
@@ -450,9 +554,9 @@ function renderOutput() {
         height: ${t.height},
         page: ${parseInt(t.page, 10) || 1}
       }`;
-    }
-    if (t.type === "link") {
-      return `      {
+        }
+        if (t.type === "link") {
+          return `      {
         type: "link",
         left: ${t.left},
         top: ${t.top},
@@ -460,11 +564,20 @@ function renderOutput() {
         height: ${t.height},
         url: "${(t.url || "").replace(/"/g, '\\"')}"
       }`;
-    }
-    if (t.type === "video") {
-      // Opsi mute/loop hanya ditulis jika dicentang, supaya hasilnya ringkas
-      const extra = (t.mute ? ",\n        mute: true" : "") + (t.loop ? ",\n        loop: true" : "");
-      return `      {
+        }
+        if (t.type === "video") {
+          const extra = (t.mute ? ",\n        mute: true" : "") + (t.loop ? ",\n        loop: true" : "");
+          if (t.videoSource === "local" || t.src) {
+            return `      {
+        type: "video",
+        left: ${t.left},
+        top: ${t.top},
+        width: ${t.width},
+        height: ${t.height},
+        src: "${(t.src || "").replace(/"/g, '\\"')}"${extra}
+      }`;
+          } else {
+            return `      {
         type: "video",
         left: ${t.left},
         top: ${t.top},
@@ -472,28 +585,30 @@ function renderOutput() {
         height: ${t.height},
         youtube: "${(t.youtube || "").replace(/"/g, '\\"')}"${extra}
       }`;
-    }
-    return `      {
+          }
+        }
+        return `      {
         type: "${t.type}",
         left: ${t.left},
         top: ${t.top},
         width: ${t.width},
         height: ${t.height}
       }`;
-  });
-  output.value = `triggers: [\n${lines.join(",\n")}\n    ]`;
-}
+      });
+      output.value = `triggers: [\n${lines.join(",\n")}\n    ]`;
+    }
 
-// ===== Pendengar: Tombol Salin ke Clipboard =====
-// Saat tombol "Copy ke Clipboard" diklik: pilih semua teks di area output dan salin
-copyBtn.addEventListener("click", () => {
-  output.select();
-  // execCommand("copy") adalah cara lama menyalin teks — masih didukung semua browser
-  document.execCommand("copy");
-  // Ubah label tombol sementara sebagai konfirmasi bahwa teks berhasil disalin
-  copyBtn.textContent = "Tersalin!";
-  setTimeout(() => (copyBtn.textContent = "Copy ke Clipboard"), 1200);
-});
-</script>
+    // ===== Pendengar: Tombol Salin ke Clipboard =====
+    // Saat tombol "Copy ke Clipboard" diklik: pilih semua teks di area output dan salin
+    copyBtn.addEventListener("click", () => {
+      output.select();
+      // execCommand("copy") adalah cara lama menyalin teks — masih didukung semua browser
+      document.execCommand("copy");
+      // Ubah label tombol sementara sebagai konfirmasi bahwa teks berhasil disalin
+      copyBtn.textContent = "Tersalin!";
+      setTimeout(() => (copyBtn.textContent = "Copy ke Clipboard"), 1200);
+    });
+  </script>
 </body>
+
 </html>

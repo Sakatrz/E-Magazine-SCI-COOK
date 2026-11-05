@@ -381,8 +381,12 @@ function mountPageVideos(page) {
 
   page.triggers.forEach((trigger) => {
     if (trigger.type !== "video") return;
-    const id = extractYouTubeId(trigger.youtube);
-    if (!id) return; // link/ID tidak dikenali → lewati
+
+    // Cek sumber video: MP4 lokal (src) atau YouTube (youtube)
+    const isLocal = Boolean(trigger.src);
+    const ytId = !isLocal ? extractYouTubeId(trigger.youtube) : "";
+
+    if (!isLocal && !ytId) return; // Jika YouTube tapi ID tidak valid, lewati
 
     // Hanya video pertama yang diizinkan autoplay otomatis
     const shouldAutoplay = (videoCount === 0);
@@ -396,16 +400,41 @@ function mountPageVideos(page) {
     box.style.width = trigger.width + "%";
     box.style.height = trigger.height + "%";
 
-    const frame = document.createElement("iframe");
-    frame.src = buildYouTubeUrl(id, trigger, shouldAutoplay);
-    frame.title = trigger.title || "Video";
-    // allow="autoplay": izin agar pemutar YouTube boleh langsung memutar (termasuk dengan suara)
-    frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
-    frame.allowFullscreen = true;
-    // YouTube membutuhkan informasi asal situs; nilai ini mengirimkannya dengan aman
-    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    if (isLocal) {
+      // Pemutar Video MP4 Lokal (HTML5)
+      const videoEl = document.createElement("video");
+      videoEl.src = trigger.src;
+      videoEl.playsInline = true;
+      videoEl.setAttribute("playsinline", "");
+      videoEl.controls = trigger.controls !== false; // default tampilkan tombol kontrol rapi
+      if (trigger.loop) videoEl.loop = true;
+      if (trigger.mute) videoEl.muted = true;
 
-    box.appendChild(frame);
+      // Autoplay hanya untuk video pertama jika diizinkan
+      if (shouldAutoplay && trigger.autoplay !== false) {
+        videoEl.autoplay = true;
+        // Di banyak browser, autoplay harus muted agar diizinkan
+        if (trigger.mute !== false) videoEl.muted = true;
+        videoEl.play().catch(() => {
+          // Jika diblokir oleh browser, kontrol tetap muncul sehingga pembaca bisa klik play
+        });
+      }
+
+      box.appendChild(videoEl);
+    } else {
+      // Pemutar Video YouTube (IFrame)
+      const frame = document.createElement("iframe");
+      frame.src = buildYouTubeUrl(ytId, trigger, shouldAutoplay);
+      frame.title = trigger.title || "Video";
+      // allow="autoplay": izin agar pemutar YouTube boleh langsung memutar (termasuk dengan suara)
+      frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      frame.allowFullscreen = true;
+      // YouTube membutuhkan informasi asal situs; nilai ini mengirimkannya dengan aman
+      frame.referrerPolicy = "strict-origin-when-cross-origin";
+
+      box.appendChild(frame);
+    }
+
     pageContainer.appendChild(box);
   });
 }
@@ -534,11 +563,41 @@ function handleTriggerClick(trigger) {
 // Parameter: popup — objek dari data trigger; bisa berisi { image, alt } atau { title, body }.
 // Dipanggil: Dari handleTriggerClick() saat trigger bertipe "popup" diklik.
 function openPopup(popup) {
-  if (popup.image) {
-    // mode gambar: tampilkan card hasil export Figma apa adanya
-    popupBody.innerHTML = "";
+  popupBody.innerHTML = "";
+  
+  if (popup.video) {
+    // Mode video popup: YouTube atau file MP4 lokal
     popupTitle.textContent = "";
-    // Sembunyikan judul saat popup hanya menampilkan gambar
+    popupTitle.classList.add("hidden");
+
+    const videoWrap = document.createElement("div");
+    videoWrap.className = "popup-video-container";
+
+    const isLocal = popup.video.endsWith(".mp4") || popup.video.endsWith(".webm") || popup.video.includes("videos/");
+    const ytId = !isLocal ? extractYouTubeId(popup.video) : "";
+
+    if (isLocal) {
+      const v = document.createElement("video");
+      v.src = popup.video;
+      v.controls = true;
+      v.autoplay = true;
+      v.playsInline = true;
+      v.setAttribute("playsinline", "");
+      videoWrap.appendChild(v);
+    } else if (ytId) {
+      const frame = document.createElement("iframe");
+      // Autoplay langsung dengan suara karena pembaca baru saja mengklik tombol trigger
+      frame.src = "https://www.youtube.com/embed/" + ytId + "?autoplay=1&playsinline=1&rel=0&modestbranding=1";
+      frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      frame.allowFullscreen = true;
+      frame.referrerPolicy = "strict-origin-when-cross-origin";
+      videoWrap.appendChild(frame);
+    }
+
+    popupBody.appendChild(videoWrap);
+  } else if (popup.image) {
+    // mode gambar: tampilkan card hasil export Figma apa adanya
+    popupTitle.textContent = "";
     popupTitle.classList.add("hidden");
 
     const img = document.createElement("img");
@@ -550,7 +609,6 @@ function openPopup(popup) {
     // mode teks: fallback kalau belum ada desain gambarnya
     popupTitle.classList.remove("hidden");
     popupTitle.textContent = popup.title || "";
-    popupBody.innerHTML = "";
     popupBody.textContent = popup.body || "";
   }
 
@@ -558,10 +616,12 @@ function openPopup(popup) {
   popupOverlay.classList.remove("hidden");
 }
 
-// Tujuan   : Menutup popup dan menyembunyikan lapisan gelap.
+// Tujuan   : Menutup popup, menyembunyikan lapisan gelap, dan mematikan video/suara seketika.
 // Dipanggil: Dari tombol silang, klik area gelap, atau tekan Escape.
 function closePopup() {
   popupOverlay.classList.add("hidden");
+  // Bersihkan isi popup (terutama iframe/video) agar suara langsung berhenti
+  popupBody.innerHTML = "";
 }
 
 // ===== Pendengar Aksi (Event Listeners) =====

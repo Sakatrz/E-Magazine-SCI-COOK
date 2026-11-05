@@ -802,8 +802,7 @@ const PAGES = [
         top: 29.7,
         width: 49.7,
         height: 23.5,
-        youtube: "",
-        mute: true
+        youtube: "https://youtu.be/prt5w9jwCl0?si=p5Plc-ATQgn5qxhz",
       },
       {
         type: "video",
@@ -812,7 +811,6 @@ const PAGES = [
         width: 54.3,
         height: 21.6,
         youtube: "https://youtu.be/HDE-i9nHFQ8?si=HZcuRKyrlomIewK6",
-        mute: true
       },
     ],
   },

@@ -806,13 +806,11 @@ const PAGES = [
       },
       {
         type: "video",
-        left: 40.2,
-        top: 30.4,
-        width: 16.3,
-        height: 14.4,
-        youtube: "https://youtu.be/prt5w9jwCl0?si=SGV3Lqe4PuG1f6pN",
-        mute: true,
-        loop: true
+        left: 44.5,
+        top: 29.5,
+        width: 42.8,
+        height: 22.8,
+        youtube: "https://youtu.be/HDE-i9nHFQ8?si=iwc5e9KUyvFToCzS"
       },
     ],
   },
